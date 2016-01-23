@@ -26,3 +26,13 @@
 *.exe
 *.out
 *.app
+
+# User files
+*.user
+
+# Other
+*.ilk
+*.exp
+*.pdb
+bin/
+setup/
