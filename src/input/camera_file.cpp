@@ -12,7 +12,7 @@ CameraFile::~CameraFile() {
 
 }
 
-bool CameraFile::initialize(char *path) {
+bool CameraFile::initialize(const char *path) {
     m_framesCounter = 0;
     // Check path
 

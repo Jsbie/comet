@@ -10,7 +10,7 @@ public:
     SDK_Dev();
     ~SDK_Dev();
 
-    bool initialize();
+    bool initialize(int cameraType, const char* path = nullptr);
 
     void onNewInput(InputData** newData);
 

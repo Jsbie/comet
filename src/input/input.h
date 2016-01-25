@@ -12,9 +12,9 @@ namespace std {
 }
 class Camera;
 
-enum class CameraType {
-    KINECT2,
-    FILE
+enum CameraType {
+    CAMERA_KINECT2,
+    CAMERA_FILE
 };
 
 class DECLSPEC Input {
@@ -23,7 +23,7 @@ public:
     Input();
     ~Input();
 
-    bool initialize(CameraType type, char* path = nullptr);
+    bool initialize(CameraType type, const char* path = nullptr);
 
     void start();
     void stop();

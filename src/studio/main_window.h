@@ -49,25 +49,21 @@ QT_BEGIN_NAMESPACE
 class QAction;
 class QListWidget;
 class QMenu;
-class QTextEdit;
 QT_END_NAMESPACE
 
-//! [0]
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow();
+    MainWindow(QApplication*);
 
 private slots:
-    void newLetter();
-    void save();
-    void print();
-    void undo();
+    void play();
+    void pause();
+    void stop();
+    void close();
     void about();
-    void insertCustomer(const QString &customer);
-    void addParagraph(const QString &paragraph);
 
 private:
     void createActions();
@@ -76,9 +72,9 @@ private:
     void createStatusBar();
     void createDockWindows();
 
-    SDK_Dev* m_sdk;
+    QApplication* app;
+    SDK_Dev m_sdk;
 
-    QTextEdit *textEdit;
     QListWidget *customerList;
     QListWidget *paragraphsList;
 
@@ -88,14 +84,13 @@ private:
     QMenu *helpMenu;
     QToolBar *fileToolBar;
     QToolBar *editToolBar;
-    QAction *newLetterAct;
-    QAction *saveAct;
-    QAction *printAct;
-    QAction *undoAct;
+    QAction* playAct;
+    QAction* pauseAct;
+    QAction* stopAct;
+    QAction* recordAct;
+
     QAction *aboutAct;
-    QAction *aboutQtAct;
     QAction *quitAct;
 };
-//! [0]
 
 #endif

@@ -18,13 +18,14 @@ Input::Input() :
 }
 
 Input::~Input() {
+    stop();
     delete m_camera;
     delete m_localFrame;
     delete m_thread;
 }
 
-bool Input::initialize(CameraType type, char* path) {
-    if (type == CameraType::KINECT2) {
+bool Input::initialize(CameraType type, const char* path) {
+    if (type == CameraType::CAMERA_KINECT2) {
         m_camera = new CameraKinect2();
     } else {
         m_camera = new CameraFile();
@@ -56,7 +57,7 @@ void Input::start() {
 
 void Input::run() {
     while(m_isRunning == true) {
-        std::chrono::milliseconds time(15);
+        std::chrono::milliseconds time(30);
         std::this_thread::sleep_for(time);
 
         if (m_isPaused) {
@@ -83,4 +84,7 @@ CameraParameters Input::getCameraParameters() {
 
 void Input::stop() {
     m_isRunning = false;
+    if (m_thread != nullptr && m_thread->joinable()) {
+        m_thread->join();
+    }
 }

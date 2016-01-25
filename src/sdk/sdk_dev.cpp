@@ -13,19 +13,18 @@ SDK_Dev::SDK_Dev() :
     m_io(nullptr),
     m_data(new FramePack())
 {
-    initialize();
 }
 
 SDK_Dev::~SDK_Dev(){
     Log::print("~SDK()", "SDK");
-    delete m_data;
     delete m_io;
+    delete m_data;
 }
 
-bool SDK_Dev::initialize() {
+bool SDK_Dev::initialize(int cameraType, const char* path) {
     Log::print("SDK()", "SDK");
     m_io = new Input();
-    m_io->initialize(CameraType::FILE);
+    m_io->initialize(CameraType::CAMERA_FILE, path);
     m_io->registerListener(*this, &SDK_Dev::onNewInput);
     m_io->start();
 
@@ -37,7 +36,7 @@ void SDK_Dev::onNewInput(InputData** newData) {
 
     cv::Mat tmp = cv::Mat(m_data->m_input->color.rows, m_data->m_input->color.cols, CV_8UC3, m_data->m_input->color.data);
     cv::imshow("hello2", tmp);
-    cv::waitKey(0);
+    cv::waitKey(1);
 }
 
 void SDK_Dev::processNewFrame() {

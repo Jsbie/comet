@@ -11,7 +11,7 @@ public:
     CameraKinect2();
     ~CameraKinect2();
 
-    bool initialize(char* path = nullptr);
+    bool initialize(const char* path = nullptr);
     bool getNextFrame(InputData *input);
 
 private:

@@ -2,13 +2,9 @@
 
 #include "main_window.h"
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(QApplication* thisApp) :
+    app(thisApp)
 {
-    textEdit = new QTextEdit;
-    setCentralWidget(textEdit);
-
-    m_sdk = new SDK_Dev();
-
     createActions();
     createMenus();
     createToolBars();
@@ -17,174 +13,46 @@ MainWindow::MainWindow()
 
     setWindowTitle(tr("Comet Studio"));
 
-    newLetter();
+    //newLetter();
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
-void MainWindow::newLetter()
-{
-    textEdit->clear();
-
-    QTextCursor cursor(textEdit->textCursor());
-    cursor.movePosition(QTextCursor::Start);
-    QTextFrame *topFrame = cursor.currentFrame();
-    QTextFrameFormat topFrameFormat = topFrame->frameFormat();
-    topFrameFormat.setPadding(16);
-    topFrame->setFrameFormat(topFrameFormat);
-
-    QTextCharFormat textFormat;
-    QTextCharFormat boldFormat;
-    boldFormat.setFontWeight(QFont::Bold);
-    QTextCharFormat italicFormat;
-    italicFormat.setFontItalic(true);
-
-    QTextTableFormat tableFormat;
-    tableFormat.setBorder(1);
-    tableFormat.setCellPadding(16);
-    tableFormat.setAlignment(Qt::AlignRight);
-    cursor.insertTable(1, 1, tableFormat);
-    cursor.insertText("The Firm", boldFormat);
-    cursor.insertBlock();
-    cursor.insertText("321 City Street", textFormat);
-    cursor.insertBlock();
-    cursor.insertText("Industry Park");
-    cursor.insertBlock();
-    cursor.insertText("Some Country");
-    cursor.setPosition(topFrame->lastPosition());
-    cursor.insertText(QDate::currentDate().toString("d MMMM yyyy"), textFormat);
-    cursor.insertBlock();
-    cursor.insertBlock();
-    cursor.insertText("Dear ", textFormat);
-    cursor.insertText("NAME", italicFormat);
-    cursor.insertText(",", textFormat);
-    for (int i = 0; i < 3; ++i)
-        cursor.insertBlock();
-    cursor.insertText(tr("Yours sincerely,"), textFormat);
-    for (int i = 0; i < 3; ++i)
-        cursor.insertBlock();
-    cursor.insertText("The Boss", textFormat);
-    cursor.insertBlock();
-    cursor.insertText("ADDRESS", italicFormat);
+void MainWindow::play() {
+    const QString path;
+    m_sdk.initialize(0, path.toStdString().c_str());
 }
-//! [2]
 
-//! [3]
-void MainWindow::print()
-{
+void MainWindow::pause() {
 
 }
-//! [3]
 
-//! [4]
-void MainWindow::save()
-{
-    QString fileName = QFileDialog::getSaveFileName(this,
-                        tr("Choose a file name"), ".",
-                        tr("HTML (*.html *.htm)"));
-    if (fileName.isEmpty())
-        return;
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("Dock Widgets"),
-                             tr("Cannot write file %1:\n%2.")
-                             .arg(fileName)
-                             .arg(file.errorString()));
-        return;
-    }
-
-    QTextStream out(&file);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    out << textEdit->toHtml();
-    QApplication::restoreOverrideCursor();
-
-    statusBar()->showMessage(tr("Saved '%1'").arg(fileName), 2000);
-}
-//! [4]
-
-//! [5]
-void MainWindow::undo()
-{
-    QTextDocument *document = textEdit->document();
-    document->undo();
-}
-//! [5]
-
-//! [6]
-void MainWindow::insertCustomer(const QString &customer)
-{
-    if (customer.isEmpty())
-        return;
-    QStringList customerList = customer.split(", ");
-    QTextDocument *document = textEdit->document();
-    QTextCursor cursor = document->find("NAME");
-    if (!cursor.isNull()) {
-        cursor.beginEditBlock();
-        cursor.insertText(customerList.at(0));
-        QTextCursor oldcursor = cursor;
-        cursor = document->find("ADDRESS");
-        if (!cursor.isNull()) {
-            for (int i = 1; i < customerList.size(); ++i) {
-                cursor.insertBlock();
-                cursor.insertText(customerList.at(i));
-            }
-            cursor.endEditBlock();
-        }
-        else
-            oldcursor.endEditBlock();
-    }
-}
-//! [6]
-
-//! [7]
-void MainWindow::addParagraph(const QString &paragraph)
-{
-    if (paragraph.isEmpty())
-        return;
-    QTextDocument *document = textEdit->document();
-    QTextCursor cursor = document->find(tr("Yours sincerely,"));
-    if (cursor.isNull())
-        return;
-    cursor.beginEditBlock();
-    cursor.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor, 2);
-    cursor.insertBlock();
-    cursor.insertText(paragraph);
-    cursor.insertBlock();
-    cursor.endEditBlock();
+void MainWindow::stop() {
 
 }
-//! [7]
+
+void MainWindow::close() {
+    QTimer::singleShot(250, app, SLOT(quit()));
+}
 
 void MainWindow::about()
 {
-   QMessageBox::about(this, tr("About Dock Widgets"),
-            tr("The <b>Dock Widgets</b> example demonstrates how to "
-               "use Qt's dock widgets. You can enter your own text, "
-               "click a customer to add a customer name and "
-               "address, and click standard paragraphs to add them."));
+   QMessageBox::about(this, tr("Comet studio"),
+            tr("The <b>Comet Studio</b> is an internal dev app "
+               "used to test Comet SDK."));
 }
 
 void MainWindow::createActions()
 {
-    newLetterAct = new QAction(QIcon(":/images/new.png"), tr("&New Letter"),
-                               this);
-    newLetterAct->setShortcuts(QKeySequence::New);
-    newLetterAct->setStatusTip(tr("Create a new form letter"));
-    connect(newLetterAct, SIGNAL(triggered()), this, SLOT(newLetter()));
+    playAct    = new QAction(QIcon(":/icons/play.png"), tr("&Play"), this);
+    connect(playAct, SIGNAL(triggered()), this, SLOT(play()));
 
-    saveAct = new QAction(QIcon(":/images/save.png"), tr("&Save..."), this);
-    saveAct->setShortcuts(QKeySequence::Save);
-    saveAct->setStatusTip(tr("Save the current form letter"));
-    connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
+    pauseAct   = new QAction(QIcon(":/icons/pause.png"), tr("&Pause"), this);
+    connect(pauseAct, SIGNAL(triggered()), this, SLOT(pause()));
 
-    printAct = new QAction(QIcon(":/images/print.png"), tr("&Print..."), this);
-    printAct->setShortcuts(QKeySequence::Print);
-    printAct->setStatusTip(tr("Print the current form letter"));
-    connect(printAct, SIGNAL(triggered()), this, SLOT(print()));
+    stopAct    = new QAction(QIcon(":/icons/stop.png"), tr("&Stop"), this);
+    connect(stopAct, SIGNAL(triggered()), this, SLOT(stop()));
 
-    undoAct = new QAction(QIcon(":/images/undo.png"), tr("&Undo"), this);
-    undoAct->setShortcuts(QKeySequence::Undo);
-    undoAct->setStatusTip(tr("Undo the last editing action"));
-    connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
+    recordAct  = new QAction(QIcon(":/icons/record.png"), tr("&Record"), this);
 
     quitAct = new QAction(tr("&Quit"), this);
     quitAct->setShortcuts(QKeySequence::Quit);
@@ -194,23 +62,15 @@ void MainWindow::createActions()
     aboutAct = new QAction(tr("&About"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
-
-    aboutQtAct = new QAction(tr("About &Qt"), this);
-    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 }
 
 void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(newLetterAct);
-    fileMenu->addAction(saveAct);
-    fileMenu->addAction(printAct);
     fileMenu->addSeparator();
     fileMenu->addAction(quitAct);
 
     editMenu = menuBar()->addMenu(tr("&Edit"));
-    editMenu->addAction(undoAct);
 
     viewMenu = menuBar()->addMenu(tr("&View"));
 
@@ -218,28 +78,22 @@ void MainWindow::createMenus()
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAct);
-    helpMenu->addAction(aboutQtAct);
 }
 
 void MainWindow::createToolBars()
 {
     fileToolBar = addToolBar(tr("File"));
-    fileToolBar->addAction(newLetterAct);
-    fileToolBar->addAction(saveAct);
-    fileToolBar->addAction(printAct);
-
-    editToolBar = addToolBar(tr("Edit"));
-    editToolBar->addAction(undoAct);
+    fileToolBar->addAction(playAct);
+    fileToolBar->addAction(pauseAct);
+    fileToolBar->addAction(stopAct);
+    fileToolBar->addAction(recordAct);
 }
 
-//! [8]
 void MainWindow::createStatusBar()
 {
     statusBar()->showMessage(tr("Ready"));
 }
-//! [8]
 
-//! [9]
 void MainWindow::createDockWindows()
 {
     QDockWidget *dock = new QDockWidget(tr("Customers"), this);
@@ -280,9 +134,4 @@ void MainWindow::createDockWindows()
     addDockWidget(Qt::RightDockWidgetArea, dock);
     viewMenu->addAction(dock->toggleViewAction());
 
-    connect(customerList, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(insertCustomer(QString)));
-    connect(paragraphsList, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(addParagraph(QString)));
 }
-//! [9]

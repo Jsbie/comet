@@ -9,7 +9,7 @@ public:
     CameraFile();
     ~CameraFile();
 
-    bool initialize(char* path = nullptr);
+    bool initialize(const char* path = nullptr);
     bool getNextFrame(InputData *input);
 };
 

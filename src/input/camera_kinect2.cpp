@@ -31,7 +31,7 @@ CameraKinect2::~CameraKinect2() {
     SafeRelease( m_sensor );
 }
 
-bool CameraKinect2::initialize(char* path) {
+bool CameraKinect2::initialize(const char* path) {
     HRESULT hResult = S_OK;
     hResult = GetDefaultKinectSensor( &m_sensor );
     if( FAILED( hResult ) ){
