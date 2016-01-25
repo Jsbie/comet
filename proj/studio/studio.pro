@@ -7,7 +7,8 @@ INCLUDEPATH     = \
     ../../src/sdk
 
 HEADERS         = \
-    ../../src/studio/main_window.h
+    ../../src/studio/main_window.h \
+    ../../src/studio/dir_widget.h
 
 SOURCES         = \
     ../../src/studio/main.cpp \

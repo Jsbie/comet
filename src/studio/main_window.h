@@ -45,6 +45,8 @@
 
 #include "sdk_dev.h"
 
+#include "dir_widget.h"
+
 QT_BEGIN_NAMESPACE
 class QAction;
 class QListWidget;
@@ -72,11 +74,14 @@ private:
     void createStatusBar();
     void createDockWindows();
 
+    void addTreeItems(QTreeWidget* widget, QTreeWidgetItem* parent, QString filePath, bool isTopLevel = false);
+
     QApplication* app;
     SDK_Dev m_sdk;
 
     QListWidget *customerList;
     QListWidget *paragraphsList;
+    DirWidget* tree;
 
     QMenu *fileMenu;
     QMenu *editMenu;

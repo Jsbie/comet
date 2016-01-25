@@ -5,5 +5,7 @@
         <file>icons/record.png</file>
         <file>icons/stop.png</file>
         <file>icons/save.png</file>
+        <file>icons/folder.png</file>
+        <file>icons/file.png</file>
     </qresource>
 </RCC>
