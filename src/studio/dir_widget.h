@@ -16,30 +16,42 @@ public:
     }
     ~DirWidget(){}
 
+    /// Adds items to a parent node.
+    static void addTreeItems(QTreeWidget* widget, QTreeWidgetItem* parent, QString filePath, bool isTopLevel = false) {
+        QDir* rootDir = new QDir(filePath);
+        QFileInfoList filesList = rootDir->entryInfoList();
+
+        foreach(QFileInfo fileInfo, filesList)
+        {
+            QTreeWidgetItem* item = new QTreeWidgetItem();
+            item->setText(0,fileInfo.fileName());
+
+            if(fileInfo.isFile())
+            {
+              item->setIcon(0,*(new QIcon(":/icons/file.png")));
+            }
+            if(fileInfo.isDir())
+            {
+              item->setIcon(0,*(new QIcon(":/icons/folder.png")));
+              if (isTopLevel) {
+                  addTreeItems(nullptr, item, fileInfo.filePath(), false);
+              }
+            }
+
+            if (isTopLevel) {
+                widget->addTopLevelItem(item);
+            } else {
+                parent->addChild(item);
+            }
+        }
+    }
+
 public slots:
+  /// Shows another directory level
   void showDirectory(QTreeWidgetItem* item, int /*column*/)
   {
-    QDir* rootDir = new QDir(item->text(1));
-    QFileInfoList filesList = rootDir->entryInfoList();
-
-    foreach(QFileInfo fileInfo, filesList)
-    {
-        QTreeWidgetItem* child = new QTreeWidgetItem();
-        child->setText(0,fileInfo.fileName());
-
-        if(fileInfo.isFile())
-        {
-          child->setIcon(0,*(new QIcon(":/icons/file.png")));
-        }
-        if(fileInfo.isDir())
-        {
-          child->setIcon(0,*(new QIcon(":/icons/folder.png")));
-        }
-
-        item->addChild(child);
-
-        resizeColumnToContents(0);
-    }
+    addTreeItems(nullptr, item, item->text(1), false);
+    resizeColumnToContents(0);
   }
 
 };

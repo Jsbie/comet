@@ -74,8 +74,6 @@ private:
     void createStatusBar();
     void createDockWindows();
 
-    void addTreeItems(QTreeWidget* widget, QTreeWidgetItem* parent, QString filePath, bool isTopLevel = false);
-
     QApplication* app;
     SDK_Dev m_sdk;
 

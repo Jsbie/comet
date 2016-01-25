@@ -140,39 +140,13 @@ void MainWindow::createDockWindows()
     rootDir->cdUp();
     rootDir->cdUp();
     tree = new DirWidget();
-    addTreeItems(tree, nullptr, rootDir->absolutePath(), true);
+    QTreeWidgetItem* headerItem = new QTreeWidgetItem();
+    headerItem->setText(0,QString("File name"));
+    tree->setHeaderItem(headerItem);
+    DirWidget::addTreeItems(tree, nullptr, rootDir->absolutePath(), true);
 
     dock = new QDockWidget(tr("Dir"), this);
     dock->setWidget(tree);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
-}
-
-void MainWindow::addTreeItems(QTreeWidget* widget, QTreeWidgetItem* parent, QString filePath, bool isTopLevel)
-{
-    QDir* rootDir = new QDir(filePath);
-    QFileInfoList filesList = rootDir->entryInfoList();
-
-    foreach(QFileInfo fileInfo, filesList)
-    {
-        QTreeWidgetItem* item = new QTreeWidgetItem();
-        item->setText(0,fileInfo.fileName());
-
-        if(fileInfo.isFile())
-        {
-          item->setIcon(0,*(new QIcon(":/icons/file.png")));
-        }
-        if(fileInfo.isDir())
-        {
-          item->setIcon(0,*(new QIcon(":/icons/folder.png")));
-          if (isTopLevel) {
-              addTreeItems(nullptr, item, fileInfo.filePath(), false);
-          }
-        }
-
-        if (isTopLevel) {
-            widget->addTopLevelItem(item);
-        } else {
-            parent->addChild(item);
-        }
-    }
+    viewMenu->addAction(dock->toggleViewAction());
 }
