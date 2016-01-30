@@ -4,7 +4,8 @@ TARGET = studio
 
 INCLUDEPATH     = \
     ../../include \
-    ../../src/sdk
+    ../../src/sdk \
+    ../../src/common
 
 HEADERS         = \
     ../../src/studio/main_window.h \

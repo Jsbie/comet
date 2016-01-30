@@ -47,9 +47,12 @@
 
 #include "dir_widget.h"
 
+#include <thread>
+
 QT_BEGIN_NAMESPACE
 class QAction;
 class QListWidget;
+class QLabel;
 class QMenu;
 QT_END_NAMESPACE
 
@@ -59,6 +62,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QApplication*);
+    ~MainWindow();
 
 private slots:
     void play();
@@ -74,12 +78,17 @@ private:
     void createStatusBar();
     void createDockWindows();
 
+    void run();
+    std::thread m_sdkThread;
+    bool    m_isRunning;
+
     QApplication* app;
     SDK_Dev m_sdk;
 
     QListWidget *customerList;
     QListWidget *paragraphsList;
     DirWidget* tree;
+    QLabel* imageView;
 
     QMenu *fileMenu;
     QMenu *editMenu;

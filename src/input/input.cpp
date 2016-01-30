@@ -19,12 +19,34 @@ Input::Input() :
 
 Input::~Input() {
     stop();
-    delete m_camera;
+    release();
     delete m_localFrame;
-    delete m_thread;
+    delete m_listener;
+}
+
+void Input::stop() {
+    Log::print("stop", "INPUT");
+    m_isRunning = false;
+    if (m_thread != nullptr) {
+        if (m_thread->joinable()) {
+            Log::print("join thread", "INPUT");
+            m_thread->join();
+        }
+        delete m_thread;
+        m_thread = nullptr;
+    }
+}
+
+void Input::release() {
+    Log::print("release", "INPUT");
+    delete m_camera;
+    m_camera = nullptr;
 }
 
 bool Input::initialize(CameraType type, const char* path) {
+    Log::print("init", "INPUT");
+    stop();
+    release();
     if (type == CameraType::CAMERA_KINECT2) {
         m_camera = new CameraKinect2();
     } else {
@@ -41,18 +63,24 @@ bool Input::initialize(CameraType type, const char* path) {
     return true;
 }
 
-void Input::start() {
+bool Input::start() {
+    Log::print("start", "INPUT");
+    stop();
     if (m_camera == nullptr) {
         Log::print("Cannot start input", "INPUT");
-        return;
+        return false;
     }
 
     m_isRunning = true;
     m_isPaused = false;
 
+    if (m_thread != nullptr) {
+        delete m_thread;
+    }
     m_thread = new std::thread(&Input::run, this);
 
     Log::print("Started input", "INPUT");
+    return true;
 }
 
 void Input::run() {
@@ -79,12 +107,5 @@ CameraParameters Input::getCameraParameters() {
         return m_camera->m_params;
     } else {
         return CameraParameters();
-    }
-}
-
-void Input::stop() {
-    m_isRunning = false;
-    if (m_thread != nullptr && m_thread->joinable()) {
-        m_thread->join();
     }
 }

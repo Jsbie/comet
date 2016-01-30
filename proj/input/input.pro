@@ -11,13 +11,13 @@ INCLUDEPATH += \
 
 HEADERS = \
         ../../include/platforms.h \
+        ../../include/camera_types.h \
         ../../src/common/log.h \
         ../../src/common/input_data.h \
         ../../src/input/camera.h \
         ../../src/input/input.h \
         ../../src/input/camera_file.h \
         ../../src/input/camera_kinect2.h \
-        ../../src/common/camera_types.h \
         ../../src/input/new_input_event.h
 
 

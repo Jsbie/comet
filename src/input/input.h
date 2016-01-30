@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include "platforms.h"
+#include "camera_types.h"
 #include "input_data.h"
 #include "new_input_event.h"
 #include "camera_types.h"
@@ -12,11 +13,6 @@ namespace std {
 }
 class Camera;
 
-enum CameraType {
-    CAMERA_KINECT2,
-    CAMERA_FILE
-};
-
 class DECLSPEC Input {
 
 public:
@@ -24,10 +20,11 @@ public:
     ~Input();
 
     bool initialize(CameraType type, const char* path = nullptr);
+    void release();
 
-    void start();
+    bool start();
     void stop();
-    void run();
+
 
     CameraParameters getCameraParameters();
 
@@ -49,6 +46,8 @@ private:
     InputData*  m_localFrame;
 
     std::thread* m_thread;
+
+    void run();
 };
 
 #endif // INPUT_H

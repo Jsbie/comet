@@ -2,8 +2,16 @@
 
 #include "main_window.h"
 
+#include <iostream>
+
+// SDK includes
+#include "frame_pack.h"
+#include "camera_types.h"
+#include "input_data.h"
+
 MainWindow::MainWindow(QApplication* thisApp) :
-    app(thisApp)
+    app(thisApp),
+    m_isRunning(false)
 {
     createActions();
     createMenus();
@@ -17,17 +25,30 @@ MainWindow::MainWindow(QApplication* thisApp) :
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
+MainWindow::~MainWindow() {
+    stop();
+}
+
 void MainWindow::play() {
+    stop();
     const QString path;
-    m_sdk.initialize(0, path.toStdString().c_str());
+    m_sdk.initialize(CAMERA_FILE, path.toStdString().c_str());
+    m_sdk.start();
+    m_isRunning = true;
+    m_sdkThread = std::thread(&MainWindow::run, this);
 }
 
 void MainWindow::pause() {
-
+    std::cout << "pause" << std::endl;
 }
 
 void MainWindow::stop() {
-
+    std::cout << "stop" << std::endl;
+    m_isRunning = false;
+    if (m_sdkThread.joinable()) {
+        m_sdkThread.join();
+    }
+    m_sdk.stop();
 }
 
 void MainWindow::close() {
@@ -39,6 +60,14 @@ void MainWindow::about()
    QMessageBox::about(this, tr("Comet studio"),
             tr("The <b>Comet Studio</b> is an internal dev app "
                "used to test Comet SDK."));
+}
+
+void MainWindow::run() {
+    while (m_isRunning){
+        std::chrono::milliseconds time(1000);
+        std::this_thread::sleep_for(time);
+        std::cout << "running" << std::endl;
+    }
 }
 
 void MainWindow::createActions()

@@ -1,9 +1,11 @@
 #ifndef FRAMEPACK_H
 #define FRAMEPACK_H
 
+#include "platforms.h"
+
 class InputData;
 
-class FramePack
+class DECLSPEC FramePack
 {
 public:
     FramePack();
