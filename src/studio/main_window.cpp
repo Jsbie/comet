@@ -9,6 +9,8 @@
 #include "camera_types.h"
 #include "input_data.h"
 
+#include <QtWidgets>
+
 MainWindow::MainWindow(QApplication* thisApp) :
     app(thisApp),
     m_isRunning(false)
@@ -63,11 +65,16 @@ void MainWindow::about()
 }
 
 void MainWindow::run() {
-    while (m_isRunning){
+    while (!m_sdk.m_newDataReady){
         std::chrono::milliseconds time(1000);
         std::this_thread::sleep_for(time);
-        std::cout << "running" << std::endl;
     }
+
+    Image& img = m_sdk.m_data->m_input->color;
+
+    QImage qimg = QImage(img.data, img.cols, img.rows, img.cols * 3, QImage::Format_RGB888);
+    imageView->setPixmap(QPixmap::fromImage(qimg));
+    imageView->show();
 }
 
 void MainWindow::createActions()
@@ -178,4 +185,16 @@ void MainWindow::createDockWindows()
     dock->setWidget(tree);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
     viewMenu->addAction(dock->toggleViewAction());
+
+    // Set image view
+    imageView = new QLabel();
+    imageView->setBackgroundRole(QPalette::Base);
+    imageView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    imageView->setScaledContents(true);
+
+    scrollArea = new QScrollArea;
+    scrollArea->setBackgroundRole(QPalette::Dark);
+    scrollArea->setWidget(imageView);
+    scrollArea->setWidgetResizable(true);
+    setCentralWidget(scrollArea);
 }

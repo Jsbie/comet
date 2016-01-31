@@ -54,6 +54,7 @@ class QAction;
 class QListWidget;
 class QLabel;
 class QMenu;
+class QScrollArea;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -89,6 +90,7 @@ private:
     QListWidget *paragraphsList;
     DirWidget* tree;
     QLabel* imageView;
+    QScrollArea* scrollArea;
 
     QMenu *fileMenu;
     QMenu *editMenu;
