@@ -5,10 +5,15 @@
 Log::Log() :
     hConsole(GetStdHandle(STD_OUTPUT_HANDLE))
 {
-    print("Created log" , "LOG");
+    d("Created log" , "LOG");
 }
 
-void Log::print(std::string message, std::string tag, LogColor tag_color) {
+void Log::d(std::string message, std::string tag, LogColor tag_color) {
+    static Log instance;
+    instance.log(message, tag, tag_color);
+}
+
+void Log::e(std::string message, std::string tag, LogColor tag_color) {
     static Log instance;
     instance.log(message, tag, tag_color);
 }

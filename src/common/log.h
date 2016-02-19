@@ -30,7 +30,8 @@ public:
     Log(Log const&) = delete;
     void operator=(Log const&) = delete;
 
-    static void print(std::string message, std::string tag = "", LogColor tag_color = LogColor::WHITE);
+    static void d(std::string message, std::string tag = "", LogColor tag_color = LogColor::WHITE);
+    static void e(std::string message, std::string tag = "", LogColor tag_color = LogColor::WHITE);
 
 private:
     void log(std::string message, std::string tag, LogColor tag_color);

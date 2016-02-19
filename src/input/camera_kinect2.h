@@ -25,7 +25,7 @@ private:
     }
 
     IKinectSensor*              m_sensor;
-    //ICoordinateMapper*          m_coordinateMapper;
+    ICoordinateMapper*          m_coordMapper;
     IMultiSourceFrameReader*    m_sourceReader;
 };
 

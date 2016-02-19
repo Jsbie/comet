@@ -12,18 +12,18 @@ SDK_Dev::SDK_Dev() :
     m_data(new FramePack()),
     m_newDataReady(false)
 {
-    Log::print("SDK()", "SDK");
+    Log::d("SDK()", "SDK");
 }
 
 SDK_Dev::~SDK_Dev(){
-    Log::print("~SDK()", "SDK");
+    Log::d("~SDK()", "SDK");
     stop();
     delete m_data;
     delete m_io;
 }
 
 bool SDK_Dev::initialize(int cameraType, const char* path) {
-    Log::print("Init", "SDK");
+    Log::d("Init", "SDK");
     stop();
     m_io->registerListener(*this, &SDK_Dev::onNewInput);
     return m_io->initialize((CameraType)(cameraType), path);
@@ -39,11 +39,20 @@ void SDK_Dev::stop() {
 }
 
 void SDK_Dev::onNewInput(InputData** newData) {
-    Log::print("SDK()", "New frame");
+    std::lock_guard<std::mutex> tmp(m_mutex);
+    Log::d("SDK()", "New frame");
     std::swap(m_data->m_input, *newData);
     m_newDataReady = true;
 }
 
 void SDK_Dev::processNewFrame() {
 
+}
+
+void SDK_Dev::lock() {
+    m_mutex.lock();
+}
+
+void SDK_Dev::unlock() {
+    m_mutex.unlock();
 }

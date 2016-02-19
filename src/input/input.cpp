@@ -13,6 +13,8 @@ Input::Input() :
     m_camera(nullptr),
     m_localFrame(new InputData()),
     m_thread(nullptr),
+    m_isRunning(false),
+    m_isPaused(false),
     m_listener(nullptr)
 {
 }
@@ -25,11 +27,14 @@ Input::~Input() {
 }
 
 void Input::stop() {
-    Log::print("stop", "INPUT");
+    if (!m_isRunning) {
+        return;
+    }
+    Log::d("stop", "INPUT");
     m_isRunning = false;
     if (m_thread != nullptr) {
         if (m_thread->joinable()) {
-            Log::print("join thread", "INPUT");
+            Log::d("join thread", "INPUT");
             m_thread->join();
         }
         delete m_thread;
@@ -38,23 +43,32 @@ void Input::stop() {
 }
 
 void Input::release() {
-    Log::print("release", "INPUT");
+    if (m_camera == nullptr) {
+        return;
+    }
+    Log::d("release", "INPUT");
     delete m_camera;
     m_camera = nullptr;
 }
 
 bool Input::initialize(CameraType type, const char* path) {
-    Log::print("init", "INPUT");
     stop();
     release();
+    Log::d("init", "INPUT");
     if (type == CameraType::CAMERA_KINECT2) {
         m_camera = new CameraKinect2();
     } else {
         m_camera = new CameraFile();
     }
 
+    // Set up channels
+    m_camera->m_depthEnabled = true;
+    m_camera->m_irEnabled = true;
+    m_camera->m_colorEnabled = true;
+
     // Initialize camera
     if (!m_camera->initialize(path)) {
+        Log::d("could not init. Relase", "INPUT");
         delete m_camera;
         m_camera = nullptr;
         return false;
@@ -64,10 +78,10 @@ bool Input::initialize(CameraType type, const char* path) {
 }
 
 bool Input::start() {
-    Log::print("start", "INPUT");
+    Log::d("start", "INPUT");
     stop();
     if (m_camera == nullptr) {
-        Log::print("Cannot start input", "INPUT");
+        Log::d("Cannot start input", "INPUT");
         return false;
     }
 
@@ -79,7 +93,7 @@ bool Input::start() {
     }
     m_thread = new std::thread(&Input::run, this);
 
-    Log::print("Started input", "INPUT");
+    Log::d("Started input", "INPUT");
     return true;
 }
 

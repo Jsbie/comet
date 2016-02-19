@@ -3,6 +3,7 @@
 #include "main_window.h"
 
 #include <iostream>
+#include "log.h"
 
 // SDK includes
 #include "frame_pack.h"
@@ -33,11 +34,14 @@ MainWindow::~MainWindow() {
 
 void MainWindow::play() {
     stop();
+    Log::d("play", "STUDIO");
     const QString path;
-    m_sdk.initialize(CAMERA_FILE, path.toStdString().c_str());
-    m_sdk.start();
-    m_isRunning = true;
-    m_sdkThread = std::thread(&MainWindow::run, this);
+    bool initialized = m_sdk.initialize(CAMERA_KINECT2, path.toStdString().c_str());
+    if (initialized) {
+        m_sdk.start();
+        m_isRunning = true;
+        m_sdkThread = std::thread(&MainWindow::run, this);
+    }
 }
 
 void MainWindow::pause() {
@@ -45,12 +49,16 @@ void MainWindow::pause() {
 }
 
 void MainWindow::stop() {
-    std::cout << "stop" << std::endl;
+    m_sdk.stop();
+    if (!m_isRunning) {
+        return;
+    }
+    Log::d("stop", "STUDIO");
+
     m_isRunning = false;
     if (m_sdkThread.joinable()) {
         m_sdkThread.join();
     }
-    m_sdk.stop();
 }
 
 void MainWindow::close() {
@@ -65,16 +73,20 @@ void MainWindow::about()
 }
 
 void MainWindow::run() {
-    while (!m_sdk.m_newDataReady){
-        std::chrono::milliseconds time(1000);
+    while (m_isRunning){
+        std::chrono::milliseconds time(15);
         std::this_thread::sleep_for(time);
+
+        m_sdk.lock();
+        if (m_sdk.m_newDataReady) {
+            Image& img = m_sdk.m_data->m_input->color;
+            QImage qimg = QImage(img.data, img.cols, img.rows, img.cols * 3, QImage::Format_RGB888);
+            imageView->setPixmap(QPixmap::fromImage(qimg));
+            imageView->show();
+            m_sdk.m_newDataReady = false;
+        }
+        m_sdk.unlock();
     }
-
-    Image& img = m_sdk.m_data->m_input->color;
-
-    QImage qimg = QImage(img.data, img.cols, img.rows, img.cols * 3, QImage::Format_RGB888);
-    imageView->setPixmap(QPixmap::fromImage(qimg));
-    imageView->show();
 }
 
 void MainWindow::createActions()

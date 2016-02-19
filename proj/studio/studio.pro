@@ -5,13 +5,15 @@ TARGET = studio
 INCLUDEPATH     = \
     ../../include \
     ../../src/sdk \
-    ../../src/common
+    ../../src/common \
+    ../../3rdparty/opencv/include
 
 HEADERS         = \
     ../../src/studio/main_window.h \
     ../../src/studio/dir_widget.h
 
 SOURCES         = \
+    ../../src/common/log.cpp \
     ../../src/studio/main.cpp \
     ../../src/studio/main_window.cpp
 

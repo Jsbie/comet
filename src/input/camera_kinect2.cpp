@@ -2,6 +2,9 @@
 
 #include "log.h"
 
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+
 CameraKinect2::CameraKinect2()
 {
     // Set supported channels
@@ -24,7 +27,8 @@ CameraKinect2::CameraKinect2()
 
 CameraKinect2::~CameraKinect2() {
     SafeRelease( m_sourceReader );
-    //SafeRelease( pDescription );
+    SafeRelease( m_coordMapper );
+
     if( m_sensor ){
         m_sensor->Close();
     }
@@ -32,18 +36,23 @@ CameraKinect2::~CameraKinect2() {
 }
 
 bool CameraKinect2::initialize(const char* path) {
+    Log::d("init", "KIN2");
     HRESULT hResult = S_OK;
     hResult = GetDefaultKinectSensor( &m_sensor );
     if( FAILED( hResult ) ){
+        Log::e("Could not find the sensor", "KIN2");
         return false;
     }
 
     hResult = m_sensor->Open();
     if( FAILED( hResult ) ){
+        Log::e("Could not open the sensor", "KIN2");
         return false;
     }
 
-    DWORD channels;
+    m_sensor->get_CoordinateMapper(&m_coordMapper);
+
+    DWORD channels = 0;
 
     if (m_depthEnabled) {
         channels = channels | FrameSourceTypes::FrameSourceTypes_Depth;
@@ -68,9 +77,11 @@ bool CameraKinect2::initialize(const char* path) {
     // Multi source reader
     hResult = m_sensor->OpenMultiSourceFrameReader(channels, &m_sourceReader);
     if( FAILED( hResult ) ){
+        Log::e("Could not open the frame reader", "KIN2");
         return false;
     }
 
+    Log::d("init ok", "KIN2");
     return true;
 }
 
@@ -83,6 +94,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
     IMultiSourceFrame* frame = nullptr;
     hResult = m_sourceReader->AcquireLatestFrame( &frame );
     if( FAILED( hResult ) ){
+        Log::e("Could not get frame", "KIN2");
         return false;
     } else if (frame != nullptr) {
         IFrameDescription* desc;
@@ -96,15 +108,16 @@ bool CameraKinect2::getNextFrame(InputData *input) {
             if ( SUCCEEDED( hResult ) ) {
                 depthRef->AcquireFrame( &depth );
             }
-            depth->get_FrameDescription(&desc);
-            desc->get_Height(&height);
-            desc->get_Width(&width);
+            if (depth != nullptr) {
+                depth->get_FrameDescription(&desc);
+                desc->get_Height(&height);
+                desc->get_Width(&width);
 
-            input->depth.updateSize(height, width, 2);
-            UINT16* data;
-            depth->AccessUnderlyingBuffer(&size, &data);
-            input->depth.copyData((unsigned char*)data);
-
+                input->depth.updateSize(height, width, 2);
+                UINT16* data;
+                depth->AccessUnderlyingBuffer(&size, &data);
+                input->depth.copyData((unsigned char*)data);
+            }
             SafeRelease(depthRef);
             SafeRelease(depth);
         }
@@ -116,15 +129,16 @@ bool CameraKinect2::getNextFrame(InputData *input) {
             if ( SUCCEEDED( hResult ) ) {
                 irRef->AcquireFrame( &ir );
             }
-            ir->get_FrameDescription(&desc);
-            desc->get_Height(&height);
-            desc->get_Width(&width);
+            if (ir != nullptr) {
+                ir->get_FrameDescription(&desc);
+                desc->get_Height(&height);
+                desc->get_Width(&width);
 
-            input->ir.updateSize(height, width, 2);
-            UINT16* data;
-            ir->AccessUnderlyingBuffer(&size, &data);
-            input->ir.copyData((unsigned char*)data);
-
+                input->ir.updateSize(height, width, 2);
+                UINT16* data;
+                ir->AccessUnderlyingBuffer(&size, &data);
+                input->ir.copyData((unsigned char*)data);
+            }
             SafeRelease(irRef);
             SafeRelease(ir);
         }
@@ -136,21 +150,28 @@ bool CameraKinect2::getNextFrame(InputData *input) {
             if ( SUCCEEDED( hResult ) ) {
                 colorRef->AcquireFrame( &color );
             }
-            color->get_FrameDescription(&desc);
-            desc->get_Height(&height);
-            desc->get_Width(&width);
+            if (color != nullptr) {
+                color->get_FrameDescription(&desc);
+                desc->get_Height(&height);
+                desc->get_Width(&width);
 
-            input->color.updateSize(height, width, 3);
-            BYTE* data;
-            color->AccessRawUnderlyingBuffer(&size, &data);
-            input->color.copyData((unsigned char*)data);
-
+                input->color.updateSize(height, width, 3);
+                BYTE* data;
+                hResult = color->AccessRawUnderlyingBuffer(&size, &data);
+                if ( SUCCEEDED( hResult ) ) {
+                    cv::Mat in = cv::Mat(height, width, CV_8UC2, data);
+                    cv::Mat out = cv::Mat(height, width, CV_8UC3, input->color.data);
+                    cv::cvtColor(in, out, CV_YUV2RGB_YUYV);
+                }
+            }
             SafeRelease(colorRef);
             SafeRelease(color);
         }
 
         SafeRelease(desc);
     }
+
+    Log::d("got next frame", "KIN2");
 
     return true;
 //    SafeRelease( skel );
