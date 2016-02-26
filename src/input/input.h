@@ -25,7 +25,6 @@ public:
     bool start();
     void stop();
 
-
     CameraParameters getCameraParameters();
 
     template<class Object, class Callback>
@@ -33,6 +32,8 @@ public:
         delete m_listener;
         m_listener = new NewInputEvent<Object, Callback>(&object, callback);
     }
+
+    int     m_activeChannels;
 
 private:
     bool    m_isRunning;

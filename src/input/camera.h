@@ -21,13 +21,7 @@ public:
     bool    m_bodySkeletonAvailable;
     bool    m_bodyMasksAvailable;
 
-    bool    m_depthEnabled;
-    bool    m_irEnabled;
-    bool    m_colorEnabled;
-    bool    m_colorRegEnabled;
-    bool    m_bodySkeletonEnabled;
-    bool    m_bodyMasksEnabled;
-
+    int     m_enabledChannels;
     int     m_framesCounter;
 
 private:

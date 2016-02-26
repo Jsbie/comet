@@ -10,12 +10,13 @@
 #include "log.h"
 
 Input::Input() :
-    m_camera(nullptr),
-    m_localFrame(new InputData()),
-    m_thread(nullptr),
+    m_activeChannels(CHANNEL_NONE),
     m_isRunning(false),
     m_isPaused(false),
-    m_listener(nullptr)
+    m_listener(nullptr),
+    m_camera(nullptr),
+    m_localFrame(new InputData()),
+    m_thread(nullptr)
 {
 }
 
@@ -62,9 +63,7 @@ bool Input::initialize(CameraType type, const char* path) {
     }
 
     // Set up channels
-    m_camera->m_depthEnabled = true;
-    m_camera->m_irEnabled = true;
-    m_camera->m_colorEnabled = true;
+    m_camera->m_enabledChannels = m_activeChannels;
 
     // Initialize camera
     if (!m_camera->initialize(path)) {

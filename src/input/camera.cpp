@@ -7,12 +7,7 @@ Camera::Camera() :
     m_colorRegAvailable(false),
     m_bodySkeletonAvailable(false),
     m_bodyMasksAvailable(false),
-    m_depthEnabled(false),
-    m_irEnabled(false),
-    m_colorEnabled(false),
-    m_colorRegEnabled(false),
-    m_bodySkeletonEnabled(false),
-    m_bodyMasksEnabled(false),
+    m_enabledChannels(CHANNEL_NONE),
     m_framesCounter(0)
 {
 }

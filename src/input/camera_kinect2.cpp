@@ -54,23 +54,23 @@ bool CameraKinect2::initialize(const char* path) {
 
     DWORD channels = 0;
 
-    if (m_depthEnabled) {
+    if (m_enabledChannels & CHANNEL_DEPTH) {
         channels = channels | FrameSourceTypes::FrameSourceTypes_Depth;
     }
 
-    if (m_irEnabled) {
+    if (m_enabledChannels & CHANNEL_IR) {
         channels = channels | FrameSourceTypes::FrameSourceTypes_Infrared;
     }
 
-    if (m_colorEnabled) {
+    if (m_enabledChannels & CHANNEL_COLOR) {
         channels = channels | FrameSourceTypes::FrameSourceTypes_Color;
     }
 
-    if (m_bodySkeletonEnabled) {
+    if (m_enabledChannels & CHANNEL_BODY_SKELETON) {
         channels = channels | FrameSourceTypes::FrameSourceTypes_Body;
     }
 
-    if (m_bodyMasksEnabled) {
+    if (m_enabledChannels & CHANNEL_BODY_MASK) {
         channels = channels | FrameSourceTypes::FrameSourceTypes_BodyIndex;
     }
 
@@ -101,7 +101,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
         int width, height;
         UINT size;
 
-        if (m_depthEnabled) {
+        if (m_enabledChannels & CHANNEL_DEPTH) {
             IDepthFrame* depth   = nullptr;
             IDepthFrameReference* depthRef;
             hResult = frame->get_DepthFrameReference( &depthRef );
@@ -122,7 +122,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
             SafeRelease(depth);
         }
 
-        if (m_irEnabled) {
+        if (m_enabledChannels & CHANNEL_IR) {
             IInfraredFrame* ir = nullptr;
             IInfraredFrameReference* irRef;
             hResult = frame->get_InfraredFrameReference( &irRef );
@@ -143,7 +143,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
             SafeRelease(ir);
         }
 
-        if (m_colorEnabled) {
+        if (m_enabledChannels & CHANNEL_COLOR) {
             IColorFrame* color = nullptr;
             IColorFrameReference* colorRef;
             hResult = frame->get_ColorFrameReference( &colorRef );

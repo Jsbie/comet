@@ -46,8 +46,15 @@
 #include "sdk_dev.h"
 
 #include "dir_widget.h"
+#include "image_widget.h"
 
 #include <thread>
+
+enum class ViewMode {
+    DEPTH,
+    IR,
+    COLOR
+};
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -73,24 +80,32 @@ private slots:
     void about();
 
 private:
+    void setColorDepth(Image& img);
+    void setColorIr(Image& img);
+    void setColor(Image& img);
+
+    void run();
+
     void createActions();
     void createMenus();
     void createToolBars();
     void createStatusBar();
     void createDockWindows();
 
-    void run();
-    std::thread m_sdkThread;
-    bool    m_isRunning;
+    void keyPressEvent(QKeyEvent *event);
 
     QApplication* app;
     SDK_Dev m_sdk;
 
-    QListWidget *customerList;
-    QListWidget *paragraphsList;
-    DirWidget* tree;
-    QLabel* imageView;
-    QScrollArea* scrollArea;
+    ViewMode    m_viewMode;
+
+    std::thread m_sdkThread;
+    bool    m_isRunning;
+
+    QListWidget*    logsList;
+    DirWidget*      dirView;
+    ImageWidget*    imageView;
+    QScrollArea*    scrollArea;
 
     QMenu *fileMenu;
     QMenu *editMenu;

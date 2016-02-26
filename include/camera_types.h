@@ -12,7 +12,8 @@ enum CameraChannels {
     CHANNEL_IR = 4,
     CHANNEL_COLOR = 8,
     CHANNEL_COLOR_REG = 16,
-    CHANNEL_BODY_SKELETON = 32
+    CHANNEL_BODY_SKELETON = 32,
+    CHANNEL_BODY_MASK = 64
 };
 
 struct CameraParameters {

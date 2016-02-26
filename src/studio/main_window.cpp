@@ -14,6 +14,7 @@
 
 MainWindow::MainWindow(QApplication* thisApp) :
     app(thisApp),
+    m_viewMode(ViewMode::DEPTH),
     m_isRunning(false)
 {
     createActions();
@@ -23,8 +24,6 @@ MainWindow::MainWindow(QApplication* thisApp) :
     createDockWindows();
 
     setWindowTitle(tr("Comet Studio"));
-
-    //newLetter();
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
@@ -65,11 +64,18 @@ void MainWindow::close() {
     QTimer::singleShot(250, app, SLOT(quit()));
 }
 
-void MainWindow::about()
-{
-   QMessageBox::about(this, tr("Comet studio"),
-            tr("The <b>Comet Studio</b> is an internal dev app "
-               "used to test Comet SDK."));
+void MainWindow::setColorDepth(Image& img) {
+    m_sdk.getColorDepth(img);
+}
+
+void MainWindow::setColorIr(Image& img) {
+    m_sdk.getColorIr(img);
+}
+
+void MainWindow::setColor(Image& img) {
+    Image& in = m_sdk.m_data->m_input->color;
+    img.updateSize(in.rows, in.cols, in.bytesPerPixel);
+    img.swapData(&in.data);
 }
 
 void MainWindow::run() {
@@ -79,14 +85,36 @@ void MainWindow::run() {
 
         m_sdk.lock();
         if (m_sdk.m_newDataReady) {
-            Image& img = m_sdk.m_data->m_input->color;
-            QImage qimg = QImage(img.data, img.cols, img.rows, img.cols * 3, QImage::Format_RGB888);
-            imageView->setPixmap(QPixmap::fromImage(qimg));
+            Image tmp;
+            switch (m_viewMode) {
+                case ViewMode::DEPTH:
+                    setColorDepth(tmp);
+                    break;
+                case ViewMode::IR:
+                    setColorIr(tmp);
+                    break;
+                case ViewMode::COLOR:
+                    setColor(tmp);
+                    break;
+                default:
+                    setColorDepth(tmp);
+                    break;
+            }
+
+            imageView->setImg(tmp);
             imageView->show();
             m_sdk.m_newDataReady = false;
         }
         m_sdk.unlock();
     }
+}
+
+
+void MainWindow::about()
+{
+   QMessageBox::about(this, tr("Comet studio"),
+            tr("The <b>Comet Studio</b> is an internal dev app "
+               "used to test Comet SDK."));
 }
 
 void MainWindow::createActions()
@@ -144,42 +172,12 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createDockWindows()
 {
-    QDockWidget *dock = new QDockWidget(tr("Customers"), this);
+    QDockWidget *dock = new QDockWidget(tr("Logs"), this);
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    customerList = new QListWidget(dock);
-    customerList->addItems(QStringList()
-            << "John Doe, Harmony Enterprises, 12 Lakeside, Ambleton"
-            << "Jane Doe, Memorabilia, 23 Watersedge, Beaton"
-            << "Tammy Shea, Tiblanka, 38 Sea Views, Carlton"
-            << "Tim Sheen, Caraba Gifts, 48 Ocean Way, Deal"
-            << "Sol Harvey, Chicos Coffee, 53 New Springs, Eccleston"
-            << "Sally Hobart, Tiroli Tea, 67 Long River, Fedula");
-    dock->setWidget(customerList);
-    addDockWidget(Qt::RightDockWidgetArea, dock);
-    viewMenu->addAction(dock->toggleViewAction());
-
-    dock = new QDockWidget(tr("Paragraphs"), this);
-    paragraphsList = new QListWidget(dock);
-    paragraphsList->addItems(QStringList()
-            << "Thank you for your payment which we have received today."
-            << "Your order has been dispatched and should be with you "
-               "within 28 days."
-            << "We have dispatched those items that were in stock. The "
-               "rest of your order will be dispatched once all the "
-               "remaining items have arrived at our warehouse. No "
-               "additional shipping charges will be made."
-            << "You made a small overpayment (less than $5) which we "
-               "will keep on account for you, or return at your request."
-            << "You made a small underpayment (less than $1), but we have "
-               "sent your order anyway. We'll add this underpayment to "
-               "your next bill."
-            << "Unfortunately you did not send enough money. Please remit "
-               "an additional $. Your order will be dispatched as soon as "
-               "the complete amount has been received."
-            << "You made an overpayment (more than $5). Do you wish to "
-               "buy more items, or should we return the excess to you?");
-    dock->setWidget(paragraphsList);
-    addDockWidget(Qt::RightDockWidgetArea, dock);
+    logsList = new QListWidget(dock);
+    logsList->addItems(QStringList() << "TODO: Here go logs");
+    dock->setWidget(logsList);
+    addDockWidget(Qt::BottomDockWidgetArea, dock);
     viewMenu->addAction(dock->toggleViewAction());
 
     // Create directory tree
@@ -187,19 +185,19 @@ void MainWindow::createDockWindows()
     rootDir->cdUp();
     rootDir->cdUp();
     rootDir->cdUp();
-    tree = new DirWidget();
+    dirView = new DirWidget();
     QTreeWidgetItem* headerItem = new QTreeWidgetItem();
     headerItem->setText(0,QString("File name"));
-    tree->setHeaderItem(headerItem);
-    DirWidget::addTreeItems(tree, nullptr, rootDir->absolutePath(), true);
+    dirView->setHeaderItem(headerItem);
+    DirWidget::addTreeItems(dirView, nullptr, rootDir->absolutePath(), true);
 
     dock = new QDockWidget(tr("Dir"), this);
-    dock->setWidget(tree);
+    dock->setWidget(dirView);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
     viewMenu->addAction(dock->toggleViewAction());
 
     // Set image view
-    imageView = new QLabel();
+    imageView = new ImageWidget();
     imageView->setBackgroundRole(QPalette::Base);
     imageView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     imageView->setScaledContents(true);
@@ -209,4 +207,20 @@ void MainWindow::createDockWindows()
     scrollArea->setWidget(imageView);
     scrollArea->setWidgetResizable(true);
     setCentralWidget(scrollArea);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    switch(event->key()) {
+        case Qt::Key_1:
+            m_viewMode = ViewMode::DEPTH;
+            break;
+        case Qt::Key_2:
+            m_viewMode = ViewMode::IR;
+            break;
+        case Qt::Key_3:
+            m_viewMode = ViewMode::COLOR;
+            break;
+        default:
+            break;
+    }
 }

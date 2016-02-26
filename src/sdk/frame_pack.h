@@ -4,6 +4,7 @@
 #include "platforms.h"
 
 class InputData;
+//class Image;
 
 class DECLSPEC FramePack
 {

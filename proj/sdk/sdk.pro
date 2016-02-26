@@ -25,7 +25,8 @@ HEADERS = \
         ../../src/common/log.h \
         ../../src/common/input_data.h \
         ../../src/sdk/frame_pack.h \
-    ../../include/camera_types.h
+    ../../include/camera_types.h \
+    ../../include/recording_types.h
 
 
 SOURCES = \
