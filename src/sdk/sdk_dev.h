@@ -6,6 +6,7 @@ class Image;
 class Input;
 class InputData;
 class FramePack;
+class Recorder;
 
 class DECLSPEC SDK_Dev {
 
@@ -22,6 +23,13 @@ public:
 
     void processNewFrame();
 
+    // Recording
+    void setRecordingChannels(int channels);
+    void setRecordingPath(const char* path);
+    void setRecording(bool enabled);
+    bool getRecording();
+
+    // TODO: remove
     void lock();
     void unlock();
 
@@ -33,5 +41,7 @@ public:
     FramePack*  m_data;
     bool m_newDataReady;
 
-    std::mutex m_mutex;
+private:
+    std::mutex  m_mutex;
+    Recorder*   m_recorder;
 };

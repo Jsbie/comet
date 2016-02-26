@@ -1,0 +1,21 @@
+#ifndef RECORDING_TYPES_H
+#define RECORDING_TYPES_H
+
+enum class RecordingMode {
+    DISABLED,
+    SINGLE_FRAME,
+    CONTINOUS
+};
+
+enum RecordingChannels {
+    RECORDING_NONE  = 0,
+    RECORDING_DEPTH = 2,
+    RECORDING_IR    = 4,
+    RECORDING_COLOR = 8,
+    RECORDING_COLOR_REG = 16,
+    RECORDING_BODY_SKEL = 32,
+    RECORDING_HAND_SEGM = 64,
+    RECORDING_HAND_SKEL = 128
+};
+
+#endif // RECORDING_TYPES_H

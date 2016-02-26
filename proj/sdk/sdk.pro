@@ -25,15 +25,17 @@ HEADERS = \
         ../../src/common/log.h \
         ../../src/common/input_data.h \
         ../../src/sdk/frame_pack.h \
-    ../../include/camera_types.h \
-    ../../include/recording_types.h
+        ../../include/camera_types.h \
+        ../../include/recording_types.h \
+        ../../src/sdk/recorder.h
 
 
 SOURCES = \
         ../../src/sdk/sdk_dev.cpp \
         ../../src/common/log.cpp \
         ../../src/common/input_data.cpp \
-        ../../src/sdk/frame_pack.cpp
+        ../../src/sdk/frame_pack.cpp \
+        ../../src/sdk/recorder.cpp
 
 CONFIG(debug, debug | release) : {
     DESTDIR = ../debug

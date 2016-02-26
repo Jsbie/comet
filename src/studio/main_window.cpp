@@ -8,6 +8,7 @@
 // SDK includes
 #include "frame_pack.h"
 #include "camera_types.h"
+#include "recording_types.h"
 #include "input_data.h"
 
 #include <QtWidgets>
@@ -57,6 +58,25 @@ void MainWindow::stop() {
     m_isRunning = false;
     if (m_sdkThread.joinable()) {
         m_sdkThread.join();
+    }
+}
+
+void MainWindow::record() {
+    bool status = m_sdk.getRecording();
+    if (status == false) {
+        int channels = RECORDING_NONE;
+        channels = channels | RECORDING_DEPTH;
+        channels = channels | RECORDING_IR;
+        channels = channels | RECORDING_COLOR;
+        channels = channels | RECORDING_COLOR_REG;
+        m_sdk.setRecordingChannels(channels);
+        m_sdk.setRecordingPath("");
+    }
+    m_sdk.setRecording(!status);
+    if (!status == true) {
+        recordAct->setIcon(QIcon(":/icons/record_clicked.png"));
+    } else {
+        recordAct->setIcon(QIcon(":/icons/record.png"));
     }
 }
 
@@ -129,6 +149,7 @@ void MainWindow::createActions()
     connect(stopAct, SIGNAL(triggered()), this, SLOT(stop()));
 
     recordAct  = new QAction(QIcon(":/icons/record.png"), tr("&Record"), this);
+    connect(recordAct, SIGNAL(triggered()), this, SLOT(record()));
 
     quitAct = new QAction(tr("&Quit"), this);
     quitAct->setShortcuts(QKeySequence::Quit);

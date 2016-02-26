@@ -7,5 +7,6 @@
         <file>icons/save.png</file>
         <file>icons/folder.png</file>
         <file>icons/file.png</file>
+        <file>icons/record_clicked.png</file>
     </qresource>
 </RCC>

@@ -4,6 +4,8 @@
 
 #include "frame_pack.h"
 #include "input.h"
+#include "recorder.h"
+
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "log.h"
@@ -11,7 +13,8 @@
 SDK_Dev::SDK_Dev() :
     m_io(new Input()),
     m_data(new FramePack()),
-    m_newDataReady(false)
+    m_newDataReady(false),
+    m_recorder(new Recorder())
 {
     Log::d("SDK()", "SDK");
 }
@@ -21,6 +24,7 @@ SDK_Dev::~SDK_Dev(){
     stop();
     delete m_data;
     delete m_io;
+    delete m_recorder;
 }
 
 bool SDK_Dev::initialize(int cameraType, const char* path) {
@@ -46,13 +50,35 @@ void SDK_Dev::stop() {
 
 void SDK_Dev::onNewInput(InputData** newData) {
     std::lock_guard<std::mutex> tmp(m_mutex);
-    Log::d("SDK()", "New frame");
     std::swap(m_data->m_input, *newData);
     m_newDataReady = true;
+    processNewFrame();
 }
 
 void SDK_Dev::processNewFrame() {
 
+    // Segmentation
+
+    // Processing
+
+    // Recording
+    m_recorder->processNewFrame(m_data);
+}
+
+void SDK_Dev::setRecordingChannels(int channels) {
+    m_recorder->m_recordingChannels = channels;
+}
+
+void SDK_Dev::setRecordingPath(const char* path) {
+    m_recorder->m_path = path;
+}
+
+void SDK_Dev::setRecording(bool enabled) {
+    m_recorder->m_enabled = enabled;
+}
+
+bool SDK_Dev::getRecording() {
+    return m_recorder->m_enabled;
 }
 
 void SDK_Dev::lock() {

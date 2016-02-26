@@ -76,6 +76,7 @@ private slots:
     void play();
     void pause();
     void stop();
+    void record();
     void close();
     void about();
 
