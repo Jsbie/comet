@@ -10,15 +10,20 @@ Log::Log() :
 
 void Log::d(std::string message, std::string tag, LogColor tag_color) {
     static Log instance;
-    instance.log(message, tag, tag_color);
+    instance.log(std::string("DBG"), message, tag, tag_color);
+}
+
+void Log::w(std::string message, std::string tag, LogColor tag_color) {
+    static Log instance;
+    instance.log(std::string("WRG"), message, tag, tag_color);
 }
 
 void Log::e(std::string message, std::string tag, LogColor tag_color) {
     static Log instance;
-    instance.log(message, tag, tag_color);
+    instance.log(std::string("ERR"), message, tag, tag_color);
 }
 
-void Log::log(std::string message, std::string tag, LogColor tag_color) {
+void Log::log(std::string& type, std::string& message, std::string& tag, LogColor tag_color) {
     if (tag != "") {
         switch (tag_color) {
             case(LogColor::WHITE):
@@ -31,7 +36,7 @@ void Log::log(std::string message, std::string tag, LogColor tag_color) {
         SetConsoleTextAttribute(hConsole, 2);
     #endif
 
-        std::cout << tag << " - ";
+        std::cout << type << ": " << tag << " - ";
 
     #ifdef windows
         SetConsoleTextAttribute(hConsole, 15);
