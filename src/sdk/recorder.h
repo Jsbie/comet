@@ -12,7 +12,9 @@ public:
 
     void setEnabled(bool enabled);
     void processNewFrame(FramePack* frame);
+    void saveFramePack(FramePack* frame);
 
+    int     m_counter;
     int     m_recordingChannels;
     bool    m_enabled;
     std::string     m_path;
