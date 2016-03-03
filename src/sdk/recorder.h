@@ -4,6 +4,7 @@
 #include <string>
 
 class FramePack;
+class Image;
 
 class Recorder
 {
@@ -13,6 +14,7 @@ public:
     void setEnabled(bool enabled);
     void processNewFrame(FramePack* frame);
     void saveFramePack(FramePack* frame);
+    void saveImage(Image* img, const char* type);
 
     int     m_counter;
     int     m_recordingChannels;

@@ -41,40 +41,47 @@ void Recorder::saveConfigFile() {
 void Recorder::saveFramePack(FramePack* frame) {
 
     if (m_recordingChannels & RECORDING_DEPTH) {
-        std::stringstream path;
-        path << m_path << "/" << "depth_(" << m_counter << ").png";
-        Image& in = frame->m_input->depth;
-        if (in.rows > 0 && in.cols > 0 && in.data != nullptr) {
-            cv::Mat out = cv::Mat(in.rows, in.cols, CV_16UC1, in.data);
-            cv::imwrite(path.str(), out);
-        } else {
-            Log::w("Depth empty", "REC");
-        }
+        saveImage(&frame->m_input->depth, "depth");
     }
 
     if (m_recordingChannels & RECORDING_IR) {
-        std::stringstream path;
-        path << m_path << "/" << "ir_(" << m_counter << ").png";
-        Image& in = frame->m_input->ir;
-        if (in.rows > 0 && in.cols > 0 && in.data != nullptr) {
-            cv::Mat out = cv::Mat(in.rows, in.cols, CV_16UC1, in.data);
-            cv::imwrite(path.str(), out);
-        } else {
-            Log::w("Ir empty", "REC");
-        }
+        saveImage(&frame->m_input->ir, "ir");
     }
 
     if (m_recordingChannels & RECORDING_COLOR) {
-        std::stringstream path;
-        path << m_path << "/" << "color_(" << m_counter << ").png";
-        Image& in = frame->m_input->color;
-        if (in.rows > 0 && in.cols > 0 && in.data != nullptr) {
-            cv::Mat out = cv::Mat(in.rows, in.cols, CV_8UC3, in.data);
-            cv::imwrite(path.str(), out);
-        } else {
-            Log::w("Color empty", "REC");
-        }
+        saveImage(&frame->m_input->color, "color");
     }
 
     m_counter++;
+}
+
+void Recorder::saveImage(Image* img, const char* typeName) {
+    std::stringstream path;
+    path << m_path << "/" << typeName << "_(" << m_counter << ").png";
+    Image& in = *img;
+    if (in.rows > 0 && in.cols > 0 && in.data != nullptr) {
+        int matType;
+        switch(in.bytesPerPixel) {
+            case 1:
+                matType = CV_8UC1;
+                break;
+            case 2:
+                matType = CV_16UC1;
+                break;
+            case 3:
+                matType = CV_8UC3;
+                break;
+            default:
+                std::stringstream err;
+                err << "Incorrect image type: " << in.bytesPerPixel;
+                Log::e(err.str(), "REC");
+                return;
+        }
+        cv::Mat out = cv::Mat(in.rows, in.cols, matType, in.data);
+        cv::imwrite(path.str(), out);
+    } else {
+        std::stringstream err;
+        err << "Empty " << typeName;
+        Log::w(err.str(), "REC");
+    }
 }
