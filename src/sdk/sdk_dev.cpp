@@ -74,7 +74,7 @@ void SDK_Dev::setRecordingPath(const char* path) {
 }
 
 void SDK_Dev::setRecording(bool enabled) {
-    m_recorder->m_enabled = enabled;
+    m_recorder->setEnabled(enabled);
 }
 
 bool SDK_Dev::getRecording() {
@@ -119,5 +119,12 @@ bool SDK_Dev::getColorIr(Image& out) {
     cv::Mat tmp;
     beg.convertTo(tmp, CV_8UC1, 255.f / (maxVal - minVal), 255.f * minVal / (minVal - maxVal));
     cv::cvtColor(tmp, dst, CV_GRAY2RGB);
+    return true;
+}
+
+bool SDK_Dev::getColor(Image &out) {
+    Image& in = m_data->m_input->color;
+    out.updateSize(in.rows, in.cols, in.bytesPerPixel);
+    out.swapData(&in.data);
     return true;
 }

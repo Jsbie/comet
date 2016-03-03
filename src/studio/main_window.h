@@ -81,10 +81,6 @@ private slots:
     void about();
 
 private:
-    void setColorDepth(Image& img);
-    void setColorIr(Image& img);
-    void setColor(Image& img);
-
     void run();
 
     void createActions();

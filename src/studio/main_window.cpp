@@ -70,7 +70,7 @@ void MainWindow::record() {
         channels = channels | RECORDING_COLOR;
         channels = channels | RECORDING_COLOR_REG;
         m_sdk.setRecordingChannels(channels);
-        m_sdk.setRecordingPath("");
+        m_sdk.setRecordingPath("C:\\Users\\Kuba\\Desktop\\Comet_Data\\2016.03.03_6.21_jl");
     }
     m_sdk.setRecording(!status);
     if (!status == true) {
@@ -84,20 +84,6 @@ void MainWindow::close() {
     QTimer::singleShot(250, app, SLOT(quit()));
 }
 
-void MainWindow::setColorDepth(Image& img) {
-    m_sdk.getColorDepth(img);
-}
-
-void MainWindow::setColorIr(Image& img) {
-    m_sdk.getColorIr(img);
-}
-
-void MainWindow::setColor(Image& img) {
-    Image& in = m_sdk.m_data->m_input->color;
-    img.updateSize(in.rows, in.cols, in.bytesPerPixel);
-    img.swapData(&in.data);
-}
-
 void MainWindow::run() {
     while (m_isRunning){
         std::chrono::milliseconds time(15);
@@ -105,23 +91,23 @@ void MainWindow::run() {
 
         m_sdk.lock();
         if (m_sdk.m_newDataReady) {
-            Image tmp;
+            Image img;
             switch (m_viewMode) {
                 case ViewMode::DEPTH:
-                    setColorDepth(tmp);
+                    m_sdk.getColorDepth(img);
                     break;
                 case ViewMode::IR:
-                    setColorIr(tmp);
+                    m_sdk.getColorIr(img);
                     break;
                 case ViewMode::COLOR:
-                    setColor(tmp);
+                    m_sdk.getColor(img);
                     break;
                 default:
-                    setColorDepth(tmp);
+                    m_sdk.getColorDepth(img);
                     break;
             }
 
-            imageView->setImg(tmp);
+            imageView->setImg(img);
             imageView->show();
             m_sdk.m_newDataReady = false;
         }
