@@ -9,3 +9,9 @@ FramePack::FramePack()
 FramePack::~FramePack() {
     delete m_input;
 }
+
+void FramePack::copyTo(FramePack& newPack) {
+    m_input->depth.copyTo(newPack.m_input->depth);
+    m_input->ir.copyTo(newPack.m_input->ir);
+    m_input->color.copyTo(newPack.m_input->color);
+}

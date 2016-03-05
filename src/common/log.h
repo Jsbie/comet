@@ -10,6 +10,13 @@
     #include <windows.h>
 #endif
 
+enum LogType {
+    LOG_DEBUG   = 0,
+    LOG_INFO    = 1,
+    LOG_WARNING = 2,
+    LOG_ERROR   = 3
+};
+
 enum class LogColor {
     BLACK,
     RED,
@@ -30,12 +37,14 @@ public:
     Log(Log const&) = delete;
     void operator=(Log const&) = delete;
 
-    static void d(std::string message, std::string tag = "", LogColor tag_color = LogColor::WHITE);
-    static void w(std::string message, std::string tag = "", LogColor tag_color = LogColor::WHITE);
-    static void e(std::string message, std::string tag = "", LogColor tag_color = LogColor::WHITE);
+    const LogType m_logLevel = LOG_DEBUG;
+
+    static void d(const char* message, const char* tag = "", LogColor tag_color = LogColor::WHITE);
+    static void w(const char* message, const char* tag = "", LogColor tag_color = LogColor::WHITE);
+    static void e(const char* message, const char* tag = "", LogColor tag_color = LogColor::WHITE);
 
 private:
-    void log(std::string& type, std::string& message, std::string& tag, LogColor tag_color);
+    void log(const LogType type, const char* message, const char* tag, LogColor tag_color);
 
     std::string m_logPath;
 

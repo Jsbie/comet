@@ -12,6 +12,7 @@ public:
     void updateSize(int newRows, int newCols, int newBytesPerPixel);
     void swapData(unsigned char** newData);
     void copyData(const unsigned char* newData);
+    void copyTo(Image& img);
 
     int cols;
     int rows;

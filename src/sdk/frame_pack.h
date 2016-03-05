@@ -22,6 +22,8 @@ public:
     // - Hands
     // -- Hand skeleton
     // - Body skeleton
+
+    void copyTo(FramePack&);
 };
 
 #endif // FRAMEPACK_H

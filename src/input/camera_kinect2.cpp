@@ -94,7 +94,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
     IMultiSourceFrame* frame = nullptr;
     hResult = m_sourceReader->AcquireLatestFrame( &frame );
     if( FAILED( hResult ) ){
-        Log::e("Could not get frame", "KIN2");
+        //Log::d("Could not get frame", "KIN2");
         return false;
     } else if (frame != nullptr) {
         IFrameDescription* desc;
@@ -171,7 +171,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
         SafeRelease(desc);
     }
 
-    Log::d("got next frame", "KIN2");
+    //Log::d("got next frame", "KIN2");
 
     return true;
 //    SafeRelease( skel );

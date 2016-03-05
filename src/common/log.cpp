@@ -8,23 +8,37 @@ Log::Log() :
     d("Created log" , "LOG");
 }
 
-void Log::d(std::string message, std::string tag, LogColor tag_color) {
+void Log::d(const char* message, const char* tag, LogColor tag_color) {
     static Log instance;
-    instance.log(std::string("DBG"), message, tag, tag_color);
+    instance.log(LOG_DEBUG, message, tag, tag_color);
 }
 
-void Log::w(std::string message, std::string tag, LogColor tag_color) {
+void Log::w(const char* message, const char* tag, LogColor tag_color) {
     static Log instance;
-    instance.log(std::string("WRG"), message, tag, tag_color);
+    instance.log(LOG_WARNING, message, tag, tag_color);
 }
 
-void Log::e(std::string message, std::string tag, LogColor tag_color) {
+void Log::e(const char* message, const char* tag, LogColor tag_color) {
     static Log instance;
-    instance.log(std::string("ERR"), message, tag, tag_color);
+    instance.log(LOG_ERROR, message, tag, tag_color);
 }
 
-void Log::log(std::string& type, std::string& message, std::string& tag, LogColor tag_color) {
-    if (tag != "") {
+void Log::log(const LogType type, const char* message, const char* tag, LogColor tag_color) {
+
+    std::string typeText;
+    if (type == LOG_ERROR) {
+        typeText = "err";
+    } else if (type == LOG_WARNING) {
+        typeText = "wrg";
+    } else if (type == LOG_INFO) {
+        typeText = "inf";
+    } else if (type == LOG_DEBUG) {
+        typeText = "dbg";
+    }
+
+    std::cout << typeText << " - ";
+
+    if (strcmp(tag, "") != 0) {
         switch (tag_color) {
             case(LogColor::WHITE):
                 break;
@@ -36,7 +50,7 @@ void Log::log(std::string& type, std::string& message, std::string& tag, LogColo
         SetConsoleTextAttribute(hConsole, 2);
     #endif
 
-        std::cout << type << ": " << tag << " - ";
+        std::cout << tag << " - ";
 
     #ifdef windows
         SetConsoleTextAttribute(hConsole, 15);

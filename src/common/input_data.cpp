@@ -37,7 +37,13 @@ void Image::swapData(unsigned char** newData) {
 }
 
 void Image::copyData(const unsigned char* newData) {
-    memcpy(data, newData, rows * cols * bytesPerPixel);
+    if (newData != nullptr)
+        memcpy(data, newData, rows * cols * bytesPerPixel);
+}
+
+void Image::copyTo(Image& img) {
+    img.updateSize(rows, cols, bytesPerPixel);
+    img.copyData(data);
 }
 
 InputData::InputData()
