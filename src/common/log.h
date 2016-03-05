@@ -11,10 +11,11 @@
 #endif
 
 enum LogType {
-    LOG_DEBUG   = 0,
-    LOG_INFO    = 1,
-    LOG_WARNING = 2,
-    LOG_ERROR   = 3
+    LOG_DETAILED    = 0,
+    LOG_DEBUG       = 1,
+    LOG_INFO        = 2,
+    LOG_WARNING     = 3,
+    LOG_ERROR       = 4
 };
 
 enum class LogColor {
@@ -39,6 +40,7 @@ public:
 
     const LogType m_logLevel = LOG_DEBUG;
 
+    static void t(const char* message, const char* tag = "", LogColor tag_color = LogColor::WHITE);
     static void d(const char* message, const char* tag = "", LogColor tag_color = LogColor::WHITE);
     static void w(const char* message, const char* tag = "", LogColor tag_color = LogColor::WHITE);
     static void e(const char* message, const char* tag = "", LogColor tag_color = LogColor::WHITE);

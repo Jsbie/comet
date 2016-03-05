@@ -14,6 +14,7 @@ public:
     bool initialize(const char* path = nullptr);
     bool getNextFrame(InputData *input);
 
+    const char* m_moduleTag = "KN2";
 private:
     template<class Interface>
     inline void SafeRelease( Interface *& pInterfaceToRelease )

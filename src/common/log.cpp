@@ -8,6 +8,11 @@ Log::Log() :
     d("Created log" , "LOG");
 }
 
+void Log::t(const char* message, const char* tag, LogColor tag_color) {
+    static Log instance;
+    instance.log(LOG_DETAILED, message, tag, tag_color);
+}
+
 void Log::d(const char* message, const char* tag, LogColor tag_color) {
     static Log instance;
     instance.log(LOG_DEBUG, message, tag, tag_color);
@@ -25,6 +30,10 @@ void Log::e(const char* message, const char* tag, LogColor tag_color) {
 
 void Log::log(const LogType type, const char* message, const char* tag, LogColor tag_color) {
 
+    if (type < m_logLevel) {
+        return;
+    }
+
     std::string typeText;
     if (type == LOG_ERROR) {
         typeText = "err";
@@ -34,6 +43,8 @@ void Log::log(const LogType type, const char* message, const char* tag, LogColor
         typeText = "inf";
     } else if (type == LOG_DEBUG) {
         typeText = "dbg";
+    } else if (type == LOG_DETAILED) {
+        typeText = "dtd";
     }
 
     std::cout << typeText << " - ";

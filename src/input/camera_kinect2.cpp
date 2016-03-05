@@ -36,17 +36,17 @@ CameraKinect2::~CameraKinect2() {
 }
 
 bool CameraKinect2::initialize(const char* path) {
-    Log::d("init", "KIN2");
+    Log::d("init", m_moduleTag);
     HRESULT hResult = S_OK;
     hResult = GetDefaultKinectSensor( &m_sensor );
     if( FAILED( hResult ) ){
-        Log::e("Could not find the sensor", "KIN2");
+        Log::e("Could not find the sensor", m_moduleTag);
         return false;
     }
 
     hResult = m_sensor->Open();
     if( FAILED( hResult ) ){
-        Log::e("Could not open the sensor", "KIN2");
+        Log::e("Could not open the sensor", m_moduleTag);
         return false;
     }
 
@@ -77,11 +77,11 @@ bool CameraKinect2::initialize(const char* path) {
     // Multi source reader
     hResult = m_sensor->OpenMultiSourceFrameReader(channels, &m_sourceReader);
     if( FAILED( hResult ) ){
-        Log::e("Could not open the frame reader", "KIN2");
+        Log::e("Could not open the frame reader", m_moduleTag);
         return false;
     }
 
-    Log::d("init ok", "KIN2");
+    Log::d("init ok", m_moduleTag);
     return true;
 }
 
@@ -94,7 +94,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
     IMultiSourceFrame* frame = nullptr;
     hResult = m_sourceReader->AcquireLatestFrame( &frame );
     if( FAILED( hResult ) ){
-        //Log::d("Could not get frame", "KIN2");
+        Log::t("Could not get frame", m_moduleTag);
         return false;
     } else if (frame != nullptr) {
         IFrameDescription* desc;
@@ -171,7 +171,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
         SafeRelease(desc);
     }
 
-    //Log::d("got next frame", "KIN2");
+    Log::t("got next frame", m_moduleTag);
 
     return true;
 //    SafeRelease( skel );
