@@ -12,6 +12,7 @@ namespace std {
     class thread;
 }
 class Camera;
+class LogWriter;
 
 class DECLSPEC Input {
 
@@ -24,6 +25,7 @@ public:
 
     bool start();
     void stop();
+    void setLogWriter(LogWriter* writer);
 
     CameraParameters getCameraParameters();
 
@@ -34,6 +36,7 @@ public:
     }
 
     int     m_activeChannels;
+    const char* m_moduleTag = "INP";
 
 private:
     bool    m_isRunning;

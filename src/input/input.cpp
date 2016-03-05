@@ -31,11 +31,11 @@ void Input::stop() {
     if (!m_isRunning) {
         return;
     }
-    Log::d("stop", "INPUT");
+    Log::d("stop", m_moduleTag);
     m_isRunning = false;
     if (m_thread != nullptr) {
         if (m_thread->joinable()) {
-            Log::d("join thread", "INPUT");
+            Log::d("join thread", m_moduleTag);
             m_thread->join();
         }
         delete m_thread;
@@ -47,7 +47,7 @@ void Input::release() {
     if (m_camera == nullptr) {
         return;
     }
-    Log::d("release", "INPUT");
+    Log::d("release", m_moduleTag);
     delete m_camera;
     m_camera = nullptr;
 }
@@ -55,7 +55,7 @@ void Input::release() {
 bool Input::initialize(CameraType type, const char* path) {
     stop();
     release();
-    Log::d("init", "INPUT");
+    Log::d("init", m_moduleTag);
     if (type == CameraType::CAMERA_KINECT2) {
         m_camera = new CameraKinect2();
     } else {
@@ -67,7 +67,7 @@ bool Input::initialize(CameraType type, const char* path) {
 
     // Initialize camera
     if (!m_camera->initialize(path)) {
-        Log::d("could not init. Relase", "INPUT");
+        Log::d("could not init. Relase", m_moduleTag);
         delete m_camera;
         m_camera = nullptr;
         return false;
@@ -77,10 +77,10 @@ bool Input::initialize(CameraType type, const char* path) {
 }
 
 bool Input::start() {
-    Log::d("start", "INPUT");
+    Log::d("start", m_moduleTag);
     stop();
     if (m_camera == nullptr) {
-        Log::d("Cannot start input", "INPUT");
+        Log::d("Cannot start input", m_moduleTag);
         return false;
     }
 
@@ -92,8 +92,12 @@ bool Input::start() {
     }
     m_thread = new std::thread(&Input::run, this);
 
-    Log::d("Started input", "INPUT");
+    Log::d("Started input", m_moduleTag);
     return true;
+}
+
+void Input::setLogWriter(LogWriter* writer) {
+    Log::setWriter(writer);
 }
 
 void Input::run() {

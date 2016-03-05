@@ -18,6 +18,8 @@ MainWindow::MainWindow(QApplication* thisApp) :
     m_viewMode(ViewMode::DEPTH),
     m_isRunning(false)
 {
+    Log::setWriter(m_sdk.m_logWriter);
+
     createActions();
     createMenus();
     createToolBars();
@@ -34,7 +36,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::play() {
     stop();
-    Log::d("play", "STUDIO");
+    Log::d("play", "STD");
     const QString path;
     bool initialized = m_sdk.initialize(CAMERA_KINECT2, path.toStdString().c_str());
     if (initialized) {
@@ -53,7 +55,7 @@ void MainWindow::stop() {
     if (!m_isRunning) {
         return;
     }
-    Log::d("stop", "STUDIO");
+    Log::d("stop", "STD");
 
     m_isRunning = false;
     if (m_sdkThread.joinable()) {

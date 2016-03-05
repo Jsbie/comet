@@ -14,8 +14,11 @@ SDK_Dev::SDK_Dev() :
     m_io(new Input()),
     m_data(new FramePack()),
     m_newDataReady(false),
-    m_recorder(new Recorder())
+    m_recorder(new Recorder()),
+    m_logWriter(new LogWriter)
 {
+    m_io->setLogWriter(m_logWriter);
+    Log::setWriter(m_logWriter);
     Log::d("SDK()", "SDK");
 }
 
@@ -25,6 +28,7 @@ SDK_Dev::~SDK_Dev(){
     delete m_data;
     delete m_io;
     delete m_recorder;
+    delete m_logWriter;
 }
 
 bool SDK_Dev::initialize(int cameraType, const char* path) {

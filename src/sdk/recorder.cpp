@@ -28,6 +28,8 @@ void Recorder::setEnabled(bool enabled) {
         Log::d(msg.str().c_str(), m_moduleTag);
         saveConfigFile();
         m_counter = 0;
+        // Add log exception to always print recording messages no matter what log level is set
+        Log::addException(m_moduleTag);
     } else if (prevEnabled == true && m_enabled == false) {
         Log::d("Stopped recording", m_moduleTag);
         // Wait for the recording thread to finish
@@ -57,7 +59,7 @@ void Recorder::processNewFrame(FramePack* frame) {
 
     std::stringstream s;
     s << "Added to queue. Queue length: " << m_queue.size();
-    Log::d(s.str().c_str(), m_moduleTag);
+    Log::t(s.str().c_str(), m_moduleTag);
 
     if (!m_threadActive) {
         if (m_thread.joinable()) {
@@ -140,7 +142,7 @@ void Recorder::run() {
 
             std::stringstream s;
             s << "Written frame " << m_counter << ". Remaining " << m_queue.size();
-            Log::d(s.str().c_str(), m_moduleTag);
+            Log::t(s.str().c_str(), m_moduleTag);
         }
         saveFramePack(tmp);
         delete tmp;

@@ -7,10 +7,11 @@ class Input;
 class InputData;
 class FramePack;
 class Recorder;
+class LogWriter;
 
 class DECLSPEC SDK_Dev {
 
-public:
+public:    
     SDK_Dev();
     ~SDK_Dev();
 
@@ -42,6 +43,7 @@ public:
     FramePack*  m_data;
     bool m_newDataReady;
 
+    LogWriter*  m_logWriter;
 private:
     std::mutex  m_mutex;
     Recorder*   m_recorder;
