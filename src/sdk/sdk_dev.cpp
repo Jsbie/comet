@@ -39,6 +39,7 @@ bool SDK_Dev::initialize(int cameraType, const char* path) {
     m_io->m_activeChannels = m_io->m_activeChannels | CHANNEL_DEPTH;
     m_io->m_activeChannels = m_io->m_activeChannels | CHANNEL_IR;
     m_io->m_activeChannels = m_io->m_activeChannels | CHANNEL_COLOR;
+    m_io->m_activeChannels = m_io->m_activeChannels | CHANNEL_COLOR_REG;
     bool result = m_io->initialize((CameraType)(cameraType), path);
     return result;
 }
@@ -128,6 +129,13 @@ bool SDK_Dev::getColorIr(Image& out) {
 
 bool SDK_Dev::getColor(Image &out) {
     Image& in = m_data->m_input->color;
+    out.updateSize(in.rows, in.cols, in.bytesPerPixel);
+    out.swapData(&in.data);
+    return true;
+}
+
+bool SDK_Dev::getColorReg(Image &out) {
+    Image& in = m_data->m_input->colorReg;
     out.updateSize(in.rows, in.cols, in.bytesPerPixel);
     out.swapData(&in.data);
     return true;

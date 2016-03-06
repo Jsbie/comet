@@ -5,7 +5,11 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
-CameraKinect2::CameraKinect2()
+CameraKinect2::CameraKinect2() :
+    m_sensor(nullptr),
+    m_coordMapper(nullptr),
+    m_sourceReader(nullptr),
+    m_colorPoints(nullptr)
 {
     // Set supported channels
     m_depthAvailable        = true;
@@ -33,6 +37,8 @@ CameraKinect2::~CameraKinect2() {
         m_sensor->Close();
     }
     SafeRelease( m_sensor );
+
+    delete[] m_colorPoints;
 }
 
 bool CameraKinect2::initialize(const char* path) {
@@ -91,24 +97,25 @@ bool CameraKinect2::getNextFrame(InputData *input) {
 //    IBodyIndexFrame*    masks   = nullptr;
 
     HRESULT hResult = S_OK;
-    IMultiSourceFrame* frame = nullptr;
+    IMultiSourceFrame* frame = NULL;
     hResult = m_sourceReader->AcquireLatestFrame( &frame );
     if( FAILED( hResult ) ){
         Log::t("Could not get frame", m_moduleTag);
+        SafeRelease(frame);
         return false;
-    } else if (frame != nullptr) {
+    } else if (frame != NULL) {
         IFrameDescription* desc;
         int width, height;
         UINT size;
 
         if (m_enabledChannels & CHANNEL_DEPTH) {
-            IDepthFrame* depth   = nullptr;
+            IDepthFrame* depth   = NULL;
             IDepthFrameReference* depthRef;
             hResult = frame->get_DepthFrameReference( &depthRef );
             if ( SUCCEEDED( hResult ) ) {
                 depthRef->AcquireFrame( &depth );
             }
-            if (depth != nullptr) {
+            if (depth != NULL) {
                 depth->get_FrameDescription(&desc);
                 desc->get_Height(&height);
                 desc->get_Width(&width);
@@ -123,13 +130,13 @@ bool CameraKinect2::getNextFrame(InputData *input) {
         }
 
         if (m_enabledChannels & CHANNEL_IR) {
-            IInfraredFrame* ir = nullptr;
+            IInfraredFrame* ir = NULL;
             IInfraredFrameReference* irRef;
             hResult = frame->get_InfraredFrameReference( &irRef );
             if ( SUCCEEDED( hResult ) ) {
                 irRef->AcquireFrame( &ir );
             }
-            if (ir != nullptr) {
+            if (ir != NULL) {
                 ir->get_FrameDescription(&desc);
                 desc->get_Height(&height);
                 desc->get_Width(&width);
@@ -144,13 +151,13 @@ bool CameraKinect2::getNextFrame(InputData *input) {
         }
 
         if (m_enabledChannels & CHANNEL_COLOR) {
-            IColorFrame* color = nullptr;
+            IColorFrame* color = NULL;
             IColorFrameReference* colorRef;
             hResult = frame->get_ColorFrameReference( &colorRef );
             if ( SUCCEEDED( hResult ) ) {
                 colorRef->AcquireFrame( &color );
             }
-            if (color != nullptr) {
+            if (color != NULL) {
                 color->get_FrameDescription(&desc);
                 desc->get_Height(&height);
                 desc->get_Width(&width);
@@ -162,14 +169,60 @@ bool CameraKinect2::getNextFrame(InputData *input) {
                     cv::Mat in = cv::Mat(height, width, CV_8UC2, data);
                     cv::Mat out = cv::Mat(height, width, CV_8UC3, input->color.data);
                     cv::cvtColor(in, out, CV_YUV2RGB_YUYV);
+                } else {
+                    input->color.clear();
                 }
             }
             SafeRelease(colorRef);
             SafeRelease(color);
         }
 
+        if ((m_enabledChannels & CHANNEL_COLOR_REG) && (m_enabledChannels & CHANNEL_DEPTH) && !input->color.empty() && !input->depth.empty()) {
+            Image& depth = input->depth;
+            input->colorReg.updateSize(depth.rows, depth.cols, 3);
+            input->colorReg.clear();
+            const int depthPixelsNum = depth.cols * depth.rows;
+            // Translate depth image to color image dimensions
+            if (m_colorPoints == nullptr) {
+                m_colorPoints = new ColorSpacePoint[input->color.rows * input->color.cols];
+            }
+            hResult = m_coordMapper->MapDepthFrameToColorSpace((UINT)depthPixelsNum, (UINT16*)depth.data, (UINT)depthPixelsNum, m_colorPoints);
+            if (SUCCEEDED(hResult)) {
+                for (int i = 0; i < depthPixelsNum; ++i) {
+
+                    // Check if pixel is valid
+                    UINT16 pixValue = (UINT16)depth.data[i];
+                    if (pixValue <= 0 || pixValue > m_params.range) {
+                        continue;
+                    }
+
+                    // Get coordinates of corresponding color point
+                    ColorSpacePoint colorPoint = m_colorPoints[i];
+
+                    // Check if mapping is correct
+                    if (colorPoint.X == -std::numeric_limits<float>::infinity() || colorPoint.Y == -std::numeric_limits<float>::infinity()) {
+                        Log::t("Improper mapping", m_moduleTag);
+                        continue;
+                    }
+
+                    int colorX = static_cast<int>(colorPoint.X + 0.5f);
+                    int colorY = static_cast<int>(colorPoint.Y + 0.5f);
+
+                    if (colorX >= 0 && colorX < input->color.cols && colorY > 0 && colorY < input->color.rows) {
+                        int idx = colorY * input->color.cols + colorX;
+                        input->colorReg.data[3 * i] = input->color.data[3 * idx];
+                        input->colorReg.data[3 * i + 1] = input->color.data[3 * idx + 1];
+                        input->colorReg.data[3 * i + 2] = input->color.data[3 * idx + 2];
+                    }
+                }
+            } else {
+                Log::w("Coordinate mapping failed", m_moduleTag);
+                input->colorReg.clear();
+            }
+        }
         SafeRelease(desc);
     }
+    SafeRelease(frame);
 
     Log::t("got next frame", m_moduleTag);
 

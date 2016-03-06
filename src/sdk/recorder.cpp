@@ -91,14 +91,22 @@ void Recorder::saveFramePack(FramePack* frame) {
         saveImage(&frame->m_input->color, "color");
     }
 
+    if (m_recordingChannels & RECORDING_COLOR_REG) {
+        saveImage(&frame->m_input->colorReg, "colorReg");
+    }
+
     m_counter++;
 }
 
 void Recorder::saveImage(Image* img, const char* typeName) {
+    if (img == nullptr) {
+        Log::e("empty", "REC");
+        return;
+    }
     std::stringstream path;
     path << m_path << "/" << typeName << "_(" << m_counter << ").png";
     Image& in = *img;
-    if (in.rows > 0 && in.cols > 0 && in.data != nullptr) {
+    if (!in.empty()) {
         int matType;
         switch(in.bytesPerPixel) {
             case 1:

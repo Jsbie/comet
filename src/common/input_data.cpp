@@ -46,6 +46,18 @@ void Image::copyTo(Image& img) {
     img.copyData(data);
 }
 
+void Image::clear() {
+    memset(data, 0, rows * cols * bytesPerPixel);
+}
+
+bool Image::empty() {
+    if (rows <= 0 || cols <= 0 || data == nullptr) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 InputData::InputData()
 {
 

@@ -19,7 +19,7 @@ private:
     template<class Interface>
     inline void SafeRelease( Interface *& pInterfaceToRelease )
     {
-        if( pInterfaceToRelease != NULL ){
+        if( pInterfaceToRelease != NULL){
             pInterfaceToRelease->Release();
             pInterfaceToRelease = NULL;
         }
@@ -28,6 +28,8 @@ private:
     IKinectSensor*              m_sensor;
     ICoordinateMapper*          m_coordMapper;
     IMultiSourceFrameReader*    m_sourceReader;
+
+    ColorSpacePoint*            m_colorPoints;
 };
 
 #endif // CAMERAKINECT2_H

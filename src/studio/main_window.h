@@ -53,7 +53,8 @@
 enum class ViewMode {
     DEPTH,
     IR,
-    COLOR
+    COLOR,
+    COLOR_REG
 };
 
 QT_BEGIN_NAMESPACE

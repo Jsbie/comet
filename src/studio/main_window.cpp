@@ -104,6 +104,9 @@ void MainWindow::run() {
                 case ViewMode::COLOR:
                     m_sdk.getColor(img);
                     break;
+                case ViewMode::COLOR_REG:
+                    m_sdk.getColorReg(img);
+                    break;
                 default:
                     m_sdk.getColorDepth(img);
                     break;
@@ -228,6 +231,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             break;
         case Qt::Key_3:
             m_viewMode = ViewMode::COLOR;
+            break;
+        case Qt::Key_4:
+            m_viewMode = ViewMode::COLOR_REG;
             break;
         default:
             break;

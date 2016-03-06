@@ -38,6 +38,7 @@ public:
     bool getColorDepth(Image& out);
     bool getColorIr(Image& out);
     bool getColor(Image& out);
+    bool getColorReg(Image& out);
 
     Input*      m_io;
     FramePack*  m_data;
