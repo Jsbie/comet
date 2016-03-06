@@ -6,6 +6,7 @@
 #include "input_data.h"
 #include "new_input_event.h"
 #include "camera_types.h"
+#include "vld.h"
 
 // Forward declarations
 namespace std {

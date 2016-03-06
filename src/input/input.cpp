@@ -8,6 +8,7 @@
 #include "camera_kinect2.h"
 
 #include "log.h"
+#include "vld.h"
 
 Input::Input() :
     m_activeChannels(CHANNEL_NONE),

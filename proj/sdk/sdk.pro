@@ -13,7 +13,8 @@ INCLUDEPATH += \
         ../../src/common \
         ../../3rdparty/eigen \
         ../../3rdparty/jsoncpp \
-        ../../3rdparty/opencv/include
+        ../../3rdparty/opencv/include \
+        ../../3rdparty/visual_leak_detector/include
 
 HEADERS = \
         ../../include/platforms.h \
@@ -49,5 +50,6 @@ LIBS += \
         ../../3rdparty/opencv/lib/windows/Release/opencv_core310.lib \
         ../../3rdparty/opencv/lib/windows/Release/opencv_imgcodecs310.lib \
         ../../3rdparty/opencv/lib/windows/Release/opencv_imgproc310.lib \
-        ../../3rdparty/opencv/lib/windows/Release/opencv_highgui310.lib
+        ../../3rdparty/opencv/lib/windows/Release/opencv_highgui310.lib \
+        ../../3rdparty/visual_leak_detector/lib/Win64/vld.lib
 
