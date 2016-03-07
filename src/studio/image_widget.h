@@ -19,11 +19,11 @@ public:
 signals:
 
 public slots:
-    void setImg(Image& m_img);
+    void setImg(cm::Image& m_img);
     void resizeEvent(QResizeEvent *);
 
 private:
-    Image m_img;
+    cm::Image m_img;
     QPixmap m_pix;
     std::mutex m_mutex;
 };

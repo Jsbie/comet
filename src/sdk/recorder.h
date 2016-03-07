@@ -7,7 +7,9 @@
 #include <mutex>
 
 class FramePack;
-class Image;
+namespace cm {
+    class Image;
+}
 
 class Recorder
 {
@@ -18,7 +20,7 @@ public:
     void setEnabled(bool enabled);
     void processNewFrame(FramePack* frame);
     void saveFramePack(FramePack* frame);
-    void saveImage(Image* img, const char* type);
+    void saveImage(cm::Image* img, const char* type);
 
     const char* m_moduleTag = "REC";
 

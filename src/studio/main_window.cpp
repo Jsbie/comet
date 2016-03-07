@@ -93,7 +93,7 @@ void MainWindow::run() {
 
         m_sdk.lock();
         if (m_sdk.m_newDataReady) {
-            Image img;
+            cm::Image img;
             switch (m_viewMode) {
                 case ViewMode::DEPTH:
                     m_sdk.getColorDepth(img);

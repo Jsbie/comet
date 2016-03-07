@@ -16,7 +16,7 @@ Input::Input() :
     m_isPaused(false),
     m_listener(nullptr),
     m_camera(nullptr),
-    m_localFrame(new InputData()),
+    m_localFrame(new cm::InputData()),
     m_thread(nullptr)
 {
 }

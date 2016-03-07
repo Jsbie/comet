@@ -10,6 +10,8 @@
 #include "opencv2/imgproc.hpp"
 #include "log.h"
 
+using namespace cm;
+
 SDK_Dev::SDK_Dev() :
     m_io(new Input()),
     m_data(new FramePack()),
@@ -40,6 +42,7 @@ bool SDK_Dev::initialize(int cameraType, const char* path) {
     m_io->m_activeChannels = m_io->m_activeChannels | CHANNEL_IR;
     m_io->m_activeChannels = m_io->m_activeChannels | CHANNEL_COLOR;
     m_io->m_activeChannels = m_io->m_activeChannels | CHANNEL_COLOR_REG;
+    m_io->m_activeChannels = m_io->m_activeChannels | CHANNEL_BODY_SKELETON;
     bool result = m_io->initialize((CameraType)(cameraType), path);
     return result;
 }

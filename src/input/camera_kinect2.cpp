@@ -91,7 +91,7 @@ bool CameraKinect2::initialize(const char* path) {
     return true;
 }
 
-bool CameraKinect2::getNextFrame(InputData *input) {
+bool CameraKinect2::getNextFrame(cm::InputData *input) {
 
 //    IBodyFrame*         skel    = nullptr;
 //    IBodyIndexFrame*    masks   = nullptr;
@@ -110,7 +110,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
 
         if (m_enabledChannels & CHANNEL_DEPTH) {
             IDepthFrame* depth   = NULL;
-            IDepthFrameReference* depthRef;
+            IDepthFrameReference* depthRef = NULL;
             hResult = frame->get_DepthFrameReference( &depthRef );
             if ( SUCCEEDED( hResult ) ) {
                 depthRef->AcquireFrame( &depth );
@@ -131,7 +131,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
 
         if (m_enabledChannels & CHANNEL_IR) {
             IInfraredFrame* ir = NULL;
-            IInfraredFrameReference* irRef;
+            IInfraredFrameReference* irRef = NULL;
             hResult = frame->get_InfraredFrameReference( &irRef );
             if ( SUCCEEDED( hResult ) ) {
                 irRef->AcquireFrame( &ir );
@@ -152,7 +152,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
 
         if (m_enabledChannels & CHANNEL_COLOR) {
             IColorFrame* color = NULL;
-            IColorFrameReference* colorRef;
+            IColorFrameReference* colorRef = NULL;
             hResult = frame->get_ColorFrameReference( &colorRef );
             if ( SUCCEEDED( hResult ) ) {
                 colorRef->AcquireFrame( &color );
@@ -178,7 +178,7 @@ bool CameraKinect2::getNextFrame(InputData *input) {
         }
 
         if ((m_enabledChannels & CHANNEL_COLOR_REG) && (m_enabledChannels & CHANNEL_DEPTH) && !input->color.empty() && !input->depth.empty()) {
-            Image& depth = input->depth;
+            cm::Image& depth = input->depth;
             input->colorReg.updateSize(depth.rows, depth.cols, 3);
             input->colorReg.clear();
             const int depthPixelsNum = depth.cols * depth.rows;
@@ -220,6 +220,28 @@ bool CameraKinect2::getNextFrame(InputData *input) {
                 input->colorReg.clear();
             }
         }
+
+        if (m_enabledChannels & CHANNEL_BODY_SKELETON) {
+            IBodyFrame* body = NULL;
+            IBodyFrameReference* bodyRef = NULL;
+            hResult = frame->get_BodyFrameReference( &bodyRef );
+            if ( SUCCEEDED( hResult ) ) {
+                bodyRef->AcquireFrame( &body );
+            }
+            if (body != NULL) {
+                IBody* bodies[BODY_COUNT] = { 0 };
+                hResult = body->GetAndRefreshBodyData(_countof(bodies), bodies);
+                if (SUCCEEDED(hResult)) {
+                    getBodySkeletons(bodies, input);
+                }
+                for (int i = 0; i < _countof(bodies); ++i) {
+                    SafeRelease(bodies[i]);
+                }
+            }
+            SafeRelease(bodyRef);
+            SafeRelease(body);
+        }
+
         SafeRelease(desc);
     }
     SafeRelease(frame);
@@ -229,4 +251,35 @@ bool CameraKinect2::getNextFrame(InputData *input) {
     return true;
 //    SafeRelease( skel );
 //    SafeRelease( masks );
+}
+
+void CameraKinect2::getBodySkeletons(IBody** bodies, cm::InputData* input) {
+    for (int i = 0; i < BODY_COUNT; ++i) {
+        cm::InputUser& user = input->users[i];
+
+        BOOLEAN tracked;
+        bodies[i]->get_IsTracked(&tracked);
+        user.m_active = (tracked == TRUE);
+
+        UINT64 id;
+        bodies[i]->get_TrackingId(&id);
+        user.m_id = (int)id;
+
+        Joint joints[JointType_Count];
+        bodies[i]->GetJoints(_countof(joints), joints);
+        for (int j = 0; j < _countof(joints); ++j) {
+
+            DepthSpacePoint depthPos = {0};
+            m_coordMapper->MapCameraPointToDepthSpace(joints[j].Position, &depthPos);
+
+            user.bodyJoints[j].pos2d.x = (int)depthPos.X;
+            user.bodyJoints[j].pos2d.y = (int)depthPos.Y;
+
+            user.bodyJoints[j].pos3d.x = joints[j].Position.X;
+            user.bodyJoints[j].pos3d.y = joints[j].Position.Y;
+            user.bodyJoints[j].pos3d.z = joints[j].Position.Z;
+        }
+
+        //user.bodyJoints
+    }
 }

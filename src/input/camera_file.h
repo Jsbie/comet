@@ -10,7 +10,7 @@ public:
     ~CameraFile();
 
     bool initialize(const char* path = nullptr);
-    bool getNextFrame(InputData *input);
+    bool getNextFrame(cm::InputData *input);
 };
 
 #endif // CAMERAFILE_H

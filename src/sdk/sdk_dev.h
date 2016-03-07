@@ -2,9 +2,12 @@
 
 #include <mutex>
 
-class Image;
 class Input;
-class InputData;
+namespace cm {
+    class Image;
+    class InputData;
+}
+
 class FramePack;
 class Recorder;
 class LogWriter;
@@ -20,7 +23,7 @@ public:
     bool start();
     void stop();
 
-    void onNewInput(InputData** newData);
+    void onNewInput(cm::InputData** newData);
 
     void processNewFrame();
 
@@ -35,10 +38,10 @@ public:
     void unlock();
 
     // Getters / setters
-    bool getColorDepth(Image& out);
-    bool getColorIr(Image& out);
-    bool getColor(Image& out);
-    bool getColorReg(Image& out);
+    bool getColorDepth(cm::Image& out);
+    bool getColorIr(cm::Image& out);
+    bool getColor(cm::Image& out);
+    bool getColorReg(cm::Image& out);
 
     Input*      m_io;
     FramePack*  m_data;

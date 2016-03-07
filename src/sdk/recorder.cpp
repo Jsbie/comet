@@ -8,6 +8,8 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 
+using namespace cm;
+
 Recorder::Recorder() :
     m_recordingChannels(RECORDING_NONE),
     m_enabled(false),

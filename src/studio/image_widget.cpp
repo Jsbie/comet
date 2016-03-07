@@ -6,7 +6,7 @@ ImageWidget::ImageWidget(QWidget *parent) :
     this->setMinimumSize(1,1);
 }
 
-void ImageWidget::setImg(Image& in) {
+void ImageWidget::setImg(cm::Image& in) {
     if (!in.empty() && in.bytesPerPixel == 3) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_img.updateSize(in.rows, in.cols, in.bytesPerPixel);

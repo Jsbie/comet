@@ -12,7 +12,9 @@ public:
     ~CameraKinect2();
 
     bool initialize(const char* path = nullptr);
-    bool getNextFrame(InputData *input);
+    bool getNextFrame(cm::InputData *input);
+
+    void getBodySkeletons(IBody** bodies, cm::InputData* input);
 
     const char* m_moduleTag = "KN2";
 private:

@@ -3,8 +3,9 @@
 
 #include "platforms.h"
 
+namespace cm {
 class InputData;
-//class Image;
+}
 
 class DECLSPEC FramePack
 {
@@ -12,7 +13,7 @@ public:
     FramePack();
     ~FramePack();
 
-    InputData*  m_input;
+    cm::InputData*  m_input;
 
     // TODO:
     // Debug data

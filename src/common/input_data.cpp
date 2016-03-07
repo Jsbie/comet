@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <string.h>
 
+namespace cm {
+
 Image::Image() :
     rows(0),
     cols(0),
@@ -64,5 +66,7 @@ InputData::InputData()
 }
 
 InputData::~InputData() {
+
+}
 
 }

@@ -3,7 +3,7 @@
 
 FramePack::FramePack()
 {
-    m_input = new InputData();
+    m_input = new cm::InputData();
 }
 
 FramePack::~FramePack() {

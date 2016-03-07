@@ -48,7 +48,7 @@ private:
     NewInputEventBase*  m_listener;     ///< Listener that will receive new input events.
 
     Camera*     m_camera;
-    InputData*  m_localFrame;
+    cm::InputData*  m_localFrame;
 
     std::thread* m_thread;
 

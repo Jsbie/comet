@@ -37,7 +37,7 @@ bool CameraFile::initialize(const char *path) {
     return true;
 }
 
-bool CameraFile::getNextFrame(InputData *input) {
+bool CameraFile::getNextFrame(cm::InputData *input) {
     if (m_framesCounter == 0) {
         cv::Mat tmp = cv::imread("..\\..\\src\\studio\\icons\\logo.png");
         input->color.updateSize(tmp.rows, tmp.cols, 3);
