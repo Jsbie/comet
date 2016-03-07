@@ -20,7 +20,7 @@ public:
     void setEnabled(bool enabled);
     void processNewFrame(FramePack* frame);
     void saveFramePack(FramePack* frame);
-    void saveImage(cm::Image* img, const char* type);
+    void saveImage(cm::Image* img, const char* type, bool convert = false);
 
     const char* m_moduleTag = "REC";
 

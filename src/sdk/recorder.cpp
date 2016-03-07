@@ -6,6 +6,7 @@
 #include "frame_pack.h"
 
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
 using namespace cm;
@@ -90,17 +91,17 @@ void Recorder::saveFramePack(FramePack* frame) {
     }
 
     if (m_recordingChannels & RECORDING_COLOR) {
-        saveImage(&frame->m_input->color, "color");
+        saveImage(&frame->m_input->color, "color", true);
     }
 
     if (m_recordingChannels & RECORDING_COLOR_REG) {
-        saveImage(&frame->m_input->colorReg, "colorReg");
+        saveImage(&frame->m_input->colorReg, "colorReg", true);
     }
 
     m_counter++;
 }
 
-void Recorder::saveImage(Image* img, const char* typeName) {
+void Recorder::saveImage(Image* img, const char* typeName, bool convert) {
     if (img == nullptr) {
         Log::e("empty", "REC");
         return;
@@ -127,6 +128,9 @@ void Recorder::saveImage(Image* img, const char* typeName) {
                 return;
         }
         cv::Mat out = cv::Mat(in.rows, in.cols, matType, in.data);
+        if (convert) {
+            cv::cvtColor(out, out, CV_RGB2BGR);
+        }
         cv::imwrite(path.str(), out);
     } else {
         std::stringstream err;

@@ -104,7 +104,7 @@ bool CameraKinect2::getNextFrame(cm::InputData *input) {
         SafeRelease(frame);
         return false;
     } else if (frame != NULL) {
-        IFrameDescription* desc;
+        IFrameDescription* desc = NULL;
         int width, height;
         UINT size;
 
