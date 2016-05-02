@@ -10,7 +10,7 @@ public:
     Camera();
     virtual ~Camera();
 
-    virtual bool initialize(const char* path = nullptr) = 0;
+    virtual bool initialize() = 0;
     virtual bool getNextFrame(cm::InputData* input) = 0;
 
     CameraParameters    m_params;

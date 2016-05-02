@@ -11,7 +11,7 @@ public:
     CameraKinect2();
     ~CameraKinect2();
 
-    bool initialize(const char* path = nullptr);
+    bool initialize();
     bool getNextFrame(cm::InputData *input);
 
     void getBodySkeletons(IBody** bodies, cm::InputData* input);

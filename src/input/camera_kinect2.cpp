@@ -41,7 +41,7 @@ CameraKinect2::~CameraKinect2() {
     delete[] m_colorPoints;
 }
 
-bool CameraKinect2::initialize(const char* path) {
+bool CameraKinect2::initialize() {
     Log::d("init", m_moduleTag);
     HRESULT hResult = S_OK;
     hResult = GetDefaultKinectSensor( &m_sensor );

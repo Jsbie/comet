@@ -37,8 +37,8 @@ MainWindow::~MainWindow() {
 void MainWindow::play() {
     stop();
     Log::d("play", "STD");
-    const QString path;
-    bool initialized = m_sdk.initialize(CAMERA_KINECT2, path.toStdString().c_str());
+    Log::d(dirView->selectedPath.c_str());
+    bool initialized = m_sdk.initialize(CAMERA_KINECT2, dirView->selectedPath.c_str());
     if (initialized) {
         m_sdk.start();
         m_isRunning = true;

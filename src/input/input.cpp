@@ -61,14 +61,16 @@ bool Input::initialize(CameraType type, const char* path) {
         m_camera = new CameraKinect2();
     } else {
         m_camera = new CameraFile();
+        if (path != nullptr)
+            ((CameraFile*)m_camera)->path = path;
     }
 
     // Set up channels
     m_camera->m_enabledChannels = m_activeChannels;
 
     // Initialize camera
-    if (!m_camera->initialize(path)) {
-        Log::d("could not init. Relase", m_moduleTag);
+    if (!m_camera->initialize()) {
+        Log::d("Could not init camera. Relase", m_moduleTag);
         delete m_camera;
         m_camera = nullptr;
         return false;

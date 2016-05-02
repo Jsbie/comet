@@ -2,9 +2,9 @@
 
 #include "json/json.h"
 #include <opencv2/highgui.hpp>
+#include "log.h"
 
-CameraFile::CameraFile()
-{
+CameraFile::CameraFile() {
 
 }
 
@@ -12,10 +12,15 @@ CameraFile::~CameraFile() {
 
 }
 
-bool CameraFile::initialize(const char *path) {
+bool CameraFile::initialize() {
     m_framesCounter = 0;
     // Check path
+    if (path == "") {
+        Log::e("Empty path!", "CFL");
+        return false;
+    }
 
+    // Load configuration file
 
     // Set supported channels
     m_depthAvailable        = true;
